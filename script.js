@@ -25,7 +25,7 @@ const clear = document.getElementById("clear");
 //Global Variables
 let stringToProcess = '';
 
-const numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+const numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
 const operators = ["+", "-", "x", "/"];
 
 let parsedValues = [];
@@ -87,7 +87,19 @@ const parseString = function() {
     };
 
     parsedValueStrings.forEach(str => {
-        parsedValues.push(parseInt(str))
+        let type = "integer";
+        for (let i = 0; i < str.length; i++) {
+            if (str[i] === ".") {
+                type = "float";
+                break
+            }
+        };
+
+        if (type === "integer") {
+            parsedValues.push(parseInt(str))
+        } else if (type === "float") {
+            parsedValues.push(parseFloat(str))
+        };        
     });
 
     console.log(`Parsed values: ${parsedValues}`);
@@ -154,6 +166,8 @@ six.addEventListener('click', function() {addValue("6")});
 seven.addEventListener('click', function() {addValue("7")});
 eight.addEventListener('click', function() {addValue("8")});
 nine.addEventListener('click', function() {addValue("9")});
+
+decimal.addEventListener('click', function() {addValue(".")});
 
 plus.addEventListener('click', function() {addValue("+")});
 minus.addEventListener('click', function() {addValue("-")});
