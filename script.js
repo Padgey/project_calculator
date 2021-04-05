@@ -20,3 +20,31 @@ const multiply = document.getElementById("x");
 const divide = document.getElementById("/");
 const equals = document.getElementById("=");
 
+const clear = document.getElementById("clear");
+
+//Logic
+let stringToProcess = '';
+
+const addValue = function(value) {
+    //console.log(`Execute number ${value}...`);
+
+    //console.log(`Appending ${value} to ${stringToProcess}...`);
+    stringToProcess += value;
+
+    console.log(`stringToProcess is now: ${stringToProcess}...`);
+    return
+}
+
+const executeString = function() {
+    for (let i = 0; i < stringToProcess.length; i++) {
+        
+    }
+}
+
+//Event Listeners
+one.addEventListener('click', function() {addValue("1")});
+two.addEventListener('click', function() {addValue("2")});
+
+plus.addEventListener('click', function() {addValue("+")});
+
+equals.addEventListener('click', executeString);
