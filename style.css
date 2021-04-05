@@ -1,0 +1,51 @@
+/*Overall*/
+body {
+    background-color: black;
+    color: white;
+}
+
+#calculator {
+    display: flex;
+    width: 400px;
+    flex-direction: column;
+}
+
+/**/
+#display {
+    background-color: rgba(70, 70, 70, 50%);
+}
+
+#input {
+    display: flex;
+    flex-direction: row;
+}
+
+/*Numbers*/
+#numbers {
+    display: flex;
+    flex-wrap: wrap;
+    flex-basis: 75%;
+}
+
+.number {
+    flex-basis: 33%;
+}
+
+#zero {
+    flex-basis: 66%;
+}
+
+/*Operators*/
+#operators {
+    display: flex;
+    flex-wrap: wrap;
+    flex-basis: 25%;
+}
+
+.operator {
+    flex-basis: 50%;
+}
+
+.equals {
+    flex-basis: 100%;
+}
