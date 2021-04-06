@@ -28,32 +28,51 @@ let stringToProcess = '';
 const numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
 const operators = ["+", "-", "x", "/"];
 
-let parsedValues = [];
-let numOfValues = 1;
-let parsedOperators = [];
-
-
 //Operator Functions
 const add = function(num1, num2) {
-    let sum = num1 + num2;
-    return sum
-}
+    let value1;
+    let value2;
+    if (num1.includes(".")) {
+        value1 = parseFloat(num1)
+    } else {
+        value1 = parseInt(num1)
+    };
 
+    if (num2.includes(".")) {
+        value2 = parseFloat(num2)
+    } else {
+        value2 = parseInt(num2)
+    };
+
+    let sum = value1 + value2;
+    return sum
+};
 const subtract = function(num1, num2) {
-    let sum = num1 - num2;
-    return sum
-}
+    let value1;
+    let value2;
+    if (num1.includes(".")) {
+        value1 = parseFloat(num1)
+    } else {
+        value1 = parseInt(num1)
+    };
 
+    if (num2.includes(".")) {
+        value2 = parseFloat(num2)
+    } else {
+        value2 = parseInt(num2)
+    };
+
+    let sum = value1 - value2;
+    return sum
+};
 const multiply = function(num1, num2) {
     let sum = num1 * num2;
     return sum
-}
-
+};
 const divide = function(num1, num2) {
     let sum = num1 / num2;
     return sum
-}
-
+};
 
 //Logic
 const addValue = function(value) {
@@ -62,98 +81,201 @@ const addValue = function(value) {
     //console.log(`Appending ${value} to ${stringToProcess}...`);
     stringToProcess += value;
 
-    console.log(`stringToProcess is now: ${stringToProcess}...`);
+    //console.log(`stringToProcess is now: ${stringToProcess}...`);
     display.innerHTML = stringToProcess;
     return
-}
+};
 
-const parseString = function() {
-    let parsedValueStrings = [];
+const reverseString = function(str) {
+    let newString = "";
+    for (let i = str.length - 1; i >= 0; i--) {
+        newString += str[i];
+    }
+    return newString
+};
 
-    for (let i = 0; i < stringToProcess.length; i++) {
-        if (numbers.includes(stringToProcess[i])) { //Check if character is a number
-            if (!parsedValueStrings[numOfValues]) {
-                parsedValueStrings.push("");
-                console.log("Creating new parsed value string...")
-            };
-
-            parsedValueStrings[(numOfValues - 1)] += stringToProcess[i]
+const retrievePreviousValue = function(index) {
+    let previousValue = "";
+    for (let i = index - 1; i >= 0; i--) {
+        if (operators.includes(stringToProcess[i])) {
+            break
         };
+        previousValue += stringToProcess[i];
+    };
+    previousValue = reverseString(previousValue);
+    return previousValue
+};
+const retrieveNextValue = function(index) {
+    let nextValue = "";
+    for (let i = index + 1; i < stringToProcess.length; i++) {
+        if (operators.includes(stringToProcess[i])) {
+            break
+        };
+        nextValue += stringToProcess[i];
+    };
+    return nextValue
+};
 
-        if (operators.includes(stringToProcess[i])) { //Check if character is operator
-            parsedOperators.push(stringToProcess[i]);
-            numOfValues++
+const retrieveFirstSpliceIndex = function(index) {
+    let firstSpliceIndex = 0;
+    for (let i = index - 1; i >= 0; i--) {
+        if (operators.includes(stringToProcess[i])) {
+            firstSpliceIndex = i + 1;
+            break
         };
     };
-
-    parsedValueStrings.forEach(str => {
-        let type = "integer";
-        for (let i = 0; i < str.length; i++) {
-            if (str[i] === ".") {
-                type = "float";
-                break
-            }
-        };
-
-        if (type === "integer") {
-            parsedValues.push(parseInt(str))
-        } else if (type === "float") {
-            parsedValues.push(parseFloat(str))
-        };        
-    });
-
-    console.log(`Parsed values: ${parsedValues}`);
-    console.log(`numOfValues: ${numOfValues}`);
-    console.log(`Parsed operators: ${parsedOperators}`);
+    return firstSpliceIndex
 }
+const retrieveSecondSpliceIndex = function(index) {
+    let secondSpliceIndex;
+    for (let i = index + 1; i < stringToProcess.length; i++) {
+        if (operators.includes(stringToProcess[i])) {
+            secondSpliceIndex = i;
+            break
+        };
+    };
+    return secondSpliceIndex
+};
 
-const executeString = function() {
-    let calculatedValue = parsedValues[0];
+const divisionPass = function() {
+    let index = 0;
 
-    for (let i = 0; i < parsedOperators.length; i++) {
-        console.log(`Performing ${parsedOperators[i]} operation...`)
-        switch (parsedOperators[i]) {
-            case "+":
-                console.log(`calculatedValue = ${calculatedValue} + ${parsedValues[(i + 1)]}`);
-                calculatedValue = add(calculatedValue, parsedValues[(i + 1)]);
-                console.log(`calculatedValue = ${calculatedValue}`);
-                break
-            case "-":
-                console.log(`calculatedValue = ${calculatedValue} - ${parsedValues[(i + 1)]}`);
-                calculatedValue = subtract(calculatedValue, parsedValues[(i + 1)]);
-                console.log(`calculatedValue = ${calculatedValue}`);
-                break
-            case "x":
-                console.log(`calculatedValue = ${calculatedValue} * ${parsedValues[(i + 1)]}`);
-                calculatedValue = multiply(calculatedValue, parsedValues[(i + 1)]);
-                console.log(`calculatedValue = ${calculatedValue}`);
-                break
-            case "/":
-                console.log(`calculatedValue = ${calculatedValue} / ${parsedValues[(i + 1)]}`);
-                calculatedValue = divide(calculatedValue, parsedValues[(i + 1)]);
-                console.log(`calculatedValue = ${calculatedValue}`);
-                break
-            default:
-                alert("OperatorError!")
+    while (index < stringToProcess.length) {
+        //console.log(`Processing index: ${index}`);
+        if (stringToProcess[index] === "/") {
+            //Retrieve the two values and make the calculation
+            let valueOne = retrievePreviousValue(index);
+            let valueTwo = retrieveNextValue(index);
+            let firstSpliceIndex = retrieveFirstSpliceIndex(index);
+            let secondSpliceIndex = retrieveSecondSpliceIndex(index);
+            let dividedValue = divide(valueOne, valueTwo);
+
+            //Modify string and place index at the correct place
+            let dividedValueString = dividedValue.toString();  //Get the value to replace the calculation in the stringToProcess
+            let firstStringPart = stringToProcess.slice(0, firstSpliceIndex);
+            let secondStringPart = '';
+            if (secondSpliceIndex) {        //This ensures that it doesn't look for another operator afterwards if there isn't one
+                secondStringPart = stringToProcess.slice(secondSpliceIndex);
+            };
+
+            let newStringToProcess = firstStringPart + dividedValueString + secondStringPart;
+            stringToProcess = newStringToProcess;
+            index = (firstSpliceIndex -1) + dividedValueString.length + 1;  //Calculate where the index where the stringToProcess should be analyzed post calculation
+            console.log(`Index on the newStringToProcess to start again on = ${index}`)
+        } else {
+            index++
         }
     }
+    console.log(`Finished divsion pass string: ${stringToProcess}`);
+};
+const multiplicationPass = function() {
+    let index = 0;
 
-    display.innerHTML = calculatedValue;
-}
+    while (index < stringToProcess.length) {
+        //console.log(`Processing index: ${index}`);
+        if (stringToProcess[index] === "x") {
+            //Retrieve the two values and make the calculation
+            let valueOne = retrievePreviousValue(index);
+            let valueTwo = retrieveNextValue(index);
+            let firstSpliceIndex = retrieveFirstSpliceIndex(index);
+            let secondSpliceIndex = retrieveSecondSpliceIndex(index);
+            let multipliedValue = multiply(valueOne, valueTwo);
+
+            //Modify string and place index at the correct place
+            let multipliedValueString = multipliedValue.toString();  //Get the value to replace the calculation in the stringToProcess
+            let firstStringPart = stringToProcess.slice(0, firstSpliceIndex);
+            let secondStringPart = '';
+            if (secondSpliceIndex) {        //This ensures that it doesn't look for another operator afterwards if there isn't one
+                secondStringPart = stringToProcess.slice(secondSpliceIndex);
+            };
+
+            let newStringToProcess = firstStringPart + multipliedValueString + secondStringPart;
+            stringToProcess = newStringToProcess;
+            index = (firstSpliceIndex -1) + multipliedValueString.length + 1;  //Calculate where the index where the stringToProcess should be analyzed post calculation
+            console.log(`Index on the newStringToProcess to start again on = ${index}`)
+        } else {
+            index++
+        }
+    }
+    console.log(`Finished multiplication pass string: ${stringToProcess}`);
+};
+const additionPass = function() {
+    let index = 0;
+
+    while (index < stringToProcess.length) {
+        //console.log(`Processing index: ${index}`);
+        if (stringToProcess[index] === "+") {
+            //Retrieve the two values and make the calculation
+            let valueOne = retrievePreviousValue(index);
+            let valueTwo = retrieveNextValue(index);
+            let firstSpliceIndex = retrieveFirstSpliceIndex(index);
+            let secondSpliceIndex = retrieveSecondSpliceIndex(index);
+            let addedValue = add(valueOne, valueTwo);
+            console.log(`addedValue: ${addedValue}`)
+
+            //Modify string and place index at the correct place
+            let addedValueString = addedValue.toString();  //Get the value to replace the calculation in the stringToProcess
+            let firstStringPart = stringToProcess.slice(0, firstSpliceIndex);
+            let secondStringPart = '';
+            if (secondSpliceIndex) {        //This ensures that it doesn't look for another operator afterwards if there isn't one
+                secondStringPart = stringToProcess.slice(secondSpliceIndex);
+            };
+
+            let newStringToProcess = firstStringPart + addedValueString + secondStringPart;
+            stringToProcess = newStringToProcess;
+            index = (firstSpliceIndex -1) + addedValueString.length + 1;  //Calculate where the index where the stringToProcess should be analyzed post calculation
+            console.log(`Index on the newStringToProcess to start again on = ${index}`)
+        } else {
+            index++
+        }
+    }
+    console.log(`Finished addition pass string: ${stringToProcess}`);
+};
+const subtractionPass = function() {
+    let index = 0;
+
+    while (index < stringToProcess.length) {
+        //console.log(`Processing index: ${index}`);
+        if (stringToProcess[index] === "-") {
+            //Retrieve the two values and make the calculation
+            let valueOne = retrievePreviousValue(index);
+            let valueTwo = retrieveNextValue(index);
+            let firstSpliceIndex = retrieveFirstSpliceIndex(index);
+            let secondSpliceIndex = retrieveSecondSpliceIndex(index);
+            let subtractedValue = subtract(valueOne, valueTwo);
+            console.log(`subtractedValue: ${subtractedValue}`)
+
+            //Modify string and place index at the correct place
+            let subtractedValueString = subtractedValue.toString();  //Get the value to replace the calculation in the stringToProcess
+            let firstStringPart = stringToProcess.slice(0, firstSpliceIndex);
+            let secondStringPart = '';
+            if (secondSpliceIndex) {        //This ensures that it doesn't look for another operator afterwards if there isn't one
+                secondStringPart = stringToProcess.slice(secondSpliceIndex);
+            };
+
+            let newStringToProcess = firstStringPart + subtractedValueString + secondStringPart;
+            stringToProcess = newStringToProcess;
+            index = (firstSpliceIndex -1) + subtractedValueString.length + 1;  //Calculate where the index where the stringToProcess should be analyzed post calculation
+            console.log(`Index on the newStringToProcess to start again on = ${index}`)
+        } else {
+            index++
+        }
+    }
+    console.log(`Finished subtraction pass string: ${stringToProcess}`);
+};
 
 const calculate = function() {
-    parseString();
-    executeString();
-}
+    divisionPass();
+    multiplicationPass();
+    additionPass();
+    subtractionPass();
+    display.innerHTML = stringToProcess
+};
 
 const clearDisplay = function() {
-    parsedValues = [];
-    numOfValues = 1;
-    parsedOperators = [];
-
     stringToProcess = '';
     display.innerHTML = '';
-}
+};
 
 //Event Listeners
 zero.addEventListener('click', function() {addValue("0")});
