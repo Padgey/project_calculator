@@ -264,11 +264,26 @@ const subtractionPass = function() {
     console.log(`Finished subtraction pass string: ${stringToProcess}`);
 };
 
-const calculate = function() {
+const checkSyntax = function() {
+    if (stringToProcess[0] === "+") {
+        stringToProcess = "0" + stringToProcess;
+    };
+    if (stringToProcess[0] === "x" || stringToProcess[0] === "/" || operators.includes(stringToProcess[(stringToProcess.length - 1)])) {
+        stringToProcess = "Syntax Error!";
+    };
+}
+
+const calculateBodmas = function() {
     divisionPass();
     multiplicationPass();
     additionPass();
     subtractionPass();
+};
+const calculate = function() {
+    checkSyntax();
+    if (stringToProcess !== "Syntax Error!") {
+        calculateBodmas();
+    }
     display.innerHTML = stringToProcess
 };
 
