@@ -161,12 +161,12 @@ const divisionPass = function() {
             let newStringToProcess = firstStringPart + dividedValueString + secondStringPart;
             stringToProcess = newStringToProcess;
             index = (firstSpliceIndex -1) + dividedValueString.length + 1;  //Calculate where the index where the stringToProcess should be analyzed post calculation
-            console.log(`Index on the newStringToProcess to start again on = ${index}`)
+            //console.log(`Index on the newStringToProcess to start again on = ${index}`)
         } else {
             index++
         }
     }
-    console.log(`Finished divsion pass string: ${stringToProcess}`);
+    console.log(`Finished division pass string: ${stringToProcess}`);
 };
 const multiplicationPass = function() {
     let index = 0;
@@ -192,7 +192,7 @@ const multiplicationPass = function() {
             let newStringToProcess = firstStringPart + multipliedValueString + secondStringPart;
             stringToProcess = newStringToProcess;
             index = (firstSpliceIndex -1) + multipliedValueString.length + 1;  //Calculate where the index where the stringToProcess should be analyzed post calculation
-            console.log(`Index on the newStringToProcess to start again on = ${index}`)
+            //console.log(`Index on the newStringToProcess to start again on = ${index}`)
         } else {
             index++
         }
@@ -224,7 +224,7 @@ const additionPass = function() {
             let newStringToProcess = firstStringPart + addedValueString + secondStringPart;
             stringToProcess = newStringToProcess;
             index = (firstSpliceIndex -1) + addedValueString.length + 1;  //Calculate where the index where the stringToProcess should be analyzed post calculation
-            console.log(`Index on the newStringToProcess to start again on = ${index}`)
+            //console.log(`Index on the newStringToProcess to start again on = ${index}`)
         } else {
             index++
         }
@@ -243,7 +243,8 @@ const subtractionPass = function() {
             let firstSpliceIndex = retrieveFirstSpliceIndex(index);
             let secondSpliceIndex = retrieveSecondSpliceIndex(index);
             let subtractedValue = subtract(valueOne, valueTwo);
-            console.log(`subtractedValue: ${subtractedValue}`)
+            console.log(`valueOne + valueTwo: ${valueOne} + ${valueTwo}`);
+            console.log(`subtractedValue: ${subtractedValue}`);
 
             //Modify string and place index at the correct place
             let subtractedValueString = subtractedValue.toString();  //Get the value to replace the calculation in the stringToProcess
@@ -256,7 +257,7 @@ const subtractionPass = function() {
             let newStringToProcess = firstStringPart + subtractedValueString + secondStringPart;
             stringToProcess = newStringToProcess;
             index = (firstSpliceIndex -1) + subtractedValueString.length + 1;  //Calculate where the index where the stringToProcess should be analyzed post calculation
-            console.log(`Index on the newStringToProcess to start again on = ${index}`)
+            //console.log(`Index on the newStringToProcess to start again on = ${index}`)
         } else {
             index++
         }
@@ -265,6 +266,7 @@ const subtractionPass = function() {
 };
 
 const checkSyntax = function() {
+    console.log(`Processing ${stringToProcess}`);
     if (stringToProcess[0] === "+") {
         stringToProcess = "0" + stringToProcess;
     };
