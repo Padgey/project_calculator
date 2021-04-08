@@ -211,6 +211,8 @@ const additionPass = function() {
             let firstSpliceIndex = retrieveFirstSpliceIndex(index);
             let secondSpliceIndex = retrieveSecondSpliceIndex(index);
             let addedValue = add(valueOne, valueTwo);
+            console.log(`Splice indexes: ${firstSpliceIndex} ${secondSpliceIndex}`);
+            console.log(`valueOne + valueTwo: ${valueOne} + ${valueTwo}`);
             console.log(`addedValue: ${addedValue}`)
 
             //Modify string and place index at the correct place
@@ -243,6 +245,7 @@ const subtractionPass = function() {
             let firstSpliceIndex = retrieveFirstSpliceIndex(index);
             let secondSpliceIndex = retrieveSecondSpliceIndex(index);
             let subtractedValue = subtract(valueOne, valueTwo);
+            console.log(`Splice indexes: ${firstSpliceIndex} ${secondSpliceIndex}`);
             console.log(`valueOne + valueTwo: ${valueOne} + ${valueTwo}`);
             console.log(`subtractedValue: ${subtractedValue}`);
 
