@@ -77,10 +77,8 @@ const divide = function(num1, num2) {
 //Logic
 const addValue = function(value) {
     //console.log(`Execute number ${value}...`);
-
     //console.log(`Appending ${value} to ${stringToProcess}...`);
     stringToProcess += value;
-
     //console.log(`stringToProcess is now: ${stringToProcess}...`);
     display.innerHTML = stringToProcess;
     return
@@ -93,10 +91,21 @@ const reverseString = function(str) {
     }
     return newString
 };
+const cleanString = function() {
+    //console.log("Checking if string starts with --")
+    if ((stringToProcess[0] === "-" && stringToProcess[1] === "-") || (stringToProcess[0] === "-" && stringToProcess[1] === "0")) {
+        console.log("String is dirty! Cleaning...")
+        stringToProcess = stringToProcess.slice(1);
+    }
+}
 
 const retrievePreviousValue = function(index) {
     let previousValue = "";
     for (let i = index - 1; i >= 0; i--) {
+        if (stringToProcess[i] === "-" && i === 0) {
+            previousValue += stringToProcess[i];
+            break
+        }
         if (operators.includes(stringToProcess[i])) {
             break
         };
@@ -166,6 +175,7 @@ const divisionPass = function() {
             index++
         }
     }
+    cleanString();
     console.log(`Finished division pass string: ${stringToProcess}`);
 };
 const multiplicationPass = function() {
@@ -197,6 +207,7 @@ const multiplicationPass = function() {
             index++
         }
     }
+    cleanString();
     console.log(`Finished multiplication pass string: ${stringToProcess}`);
 };
 const additionPass = function() {
@@ -231,6 +242,7 @@ const additionPass = function() {
             index++
         }
     }
+    cleanString();
     console.log(`Finished addition pass string: ${stringToProcess}`);
 };
 const subtractionPass = function() {
@@ -238,7 +250,7 @@ const subtractionPass = function() {
 
     while (index < stringToProcess.length) {
         //console.log(`Processing index: ${index}`);
-        if (stringToProcess[index] === "-") {
+        if (stringToProcess[index] === "-" && index !== 0) {
             //Retrieve the two values and make the calculation
             let valueOne = retrievePreviousValue(index);
             let valueTwo = retrieveNextValue(index);
@@ -246,7 +258,7 @@ const subtractionPass = function() {
             let secondSpliceIndex = retrieveSecondSpliceIndex(index);
             let subtractedValue = subtract(valueOne, valueTwo);
             console.log(`Splice indexes: ${firstSpliceIndex} ${secondSpliceIndex}`);
-            console.log(`valueOne + valueTwo: ${valueOne} + ${valueTwo}`);
+            console.log(`valueOne - valueTwo: ${valueOne} - ${valueTwo}`);
             console.log(`subtractedValue: ${subtractedValue}`);
 
             //Modify string and place index at the correct place
@@ -265,11 +277,13 @@ const subtractionPass = function() {
             index++
         }
     }
+    cleanString();
     console.log(`Finished subtraction pass string: ${stringToProcess}`);
 };
 
 const checkSyntax = function() {
-    console.log(`Processing ${stringToProcess}`);
+    console.log("________________________________________")
+    console.log(`Processing ${stringToProcess}...`);
     if (stringToProcess[0] === "+") {
         stringToProcess = "0" + stringToProcess;
     };
