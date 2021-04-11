@@ -146,7 +146,7 @@ const retrieveSecondSpliceIndex = function(index) {
     return secondSpliceIndex
 };
 
-const divisionPass = function() {
+const divisionAndMultiplicationPass = function() {
     let index = 0;
 
     while (index < stringToProcess.length) {
@@ -171,19 +171,7 @@ const divisionPass = function() {
             stringToProcess = newStringToProcess;
             index = (firstSpliceIndex -1) + dividedValueString.length + 1;  //Calculate where the index where the stringToProcess should be analyzed post calculation
             //console.log(`Index on the newStringToProcess to start again on = ${index}`)
-        } else {
-            index++
-        }
-    }
-    cleanString();
-    console.log(`Finished division pass string: ${stringToProcess}`);
-};
-const multiplicationPass = function() {
-    let index = 0;
-
-    while (index < stringToProcess.length) {
-        //console.log(`Processing index: ${index}`);
-        if (stringToProcess[index] === "x") {
+        } else if (stringToProcess[index] === "x") {
             //Retrieve the two values and make the calculation
             let valueOne = retrievePreviousValue(index);
             let valueTwo = retrieveNextValue(index);
@@ -207,10 +195,11 @@ const multiplicationPass = function() {
             index++
         }
     }
-    cleanString();
-    console.log(`Finished multiplication pass string: ${stringToProcess}`);
+    //cleanString();
+    console.log(`Finished division and multiplication pass. stringToProcess: ${stringToProcess}`);
 };
-const additionPass = function() {
+
+const additionAndSubtractionPass = function() {
     let index = 0;
 
     while (index < stringToProcess.length) {
@@ -238,19 +227,7 @@ const additionPass = function() {
             stringToProcess = newStringToProcess;
             index = (firstSpliceIndex -1) + addedValueString.length + 1;  //Calculate where the index where the stringToProcess should be analyzed post calculation
             //console.log(`Index on the newStringToProcess to start again on = ${index}`)
-        } else {
-            index++
-        }
-    }
-    cleanString();
-    console.log(`Finished addition pass string: ${stringToProcess}`);
-};
-const subtractionPass = function() {
-    let index = 0;
-
-    while (index < stringToProcess.length) {
-        //console.log(`Processing index: ${index}`);
-        if (stringToProcess[index] === "-" && index !== 0) {
+        } else if (stringToProcess[index] === "-" && index !== 0) {
             //Retrieve the two values and make the calculation
             let valueOne = retrievePreviousValue(index);
             let valueTwo = retrieveNextValue(index);
@@ -277,14 +254,15 @@ const subtractionPass = function() {
             index++
         }
     }
-    cleanString();
-    console.log(`Finished subtraction pass string: ${stringToProcess}`);
+    //cleanString();
+    console.log(`Finished addition and subtraction pass. stringToProcess: ${stringToProcess}`);
 };
+
 
 const checkSyntax = function() {
     console.log("________________________________________")
     console.log(`Processing ${stringToProcess}...`);
-    if (stringToProcess[0] === "+") {
+    if (stringToProcess[0] === "+" || stringToProcess[0] === "-") {
         stringToProcess = "0" + stringToProcess;
     };
     if (stringToProcess[0] === "x" || stringToProcess[0] === "/" || operators.includes(stringToProcess[(stringToProcess.length - 1)])) {
@@ -293,10 +271,8 @@ const checkSyntax = function() {
 }
 
 const calculateBodmas = function() {
-    divisionPass();
-    multiplicationPass();
-    additionPass();
-    subtractionPass();
+    divisionAndMultiplicationPass();
+    additionAndSubtractionPass();
 };
 const calculate = function() {
     checkSyntax();
