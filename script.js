@@ -27,6 +27,8 @@ let stringToProcess = '';
 
 const numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
 const operators = ["+", "-", "x", "/"];
+const dmOperators = ["/", "x"];
+const asOperators = ["+", "-"]
 
 //Operator Functions
 const add = function(num1, num2) {
@@ -97,7 +99,27 @@ const cleanString = function() {
         console.log("String is dirty! Cleaning...")
         stringToProcess = stringToProcess.slice(1);
     }
-}
+};
+const processConsecutiveSumOperators = function() {
+    console.log("Processing string for consecutive sum operators...")
+    let i = 0;
+    while (i < stringToProcess.length - 1) {
+        let thisCharacter = stringToProcess[i];
+        let nextCharacter = stringToProcess[i + 1];
+        if (thisCharacter === "+" && nextCharacter === "+") {
+            stringToProcess = stringToProcess.slice(0, i) + "+" + stringToProcess.slice(i + 2); 
+        } else if (thisCharacter === "+" && nextCharacter === "-") {
+            stringToProcess = stringToProcess.slice(0, i) + "-" + stringToProcess.slice(i + 2);
+        } else if (thisCharacter === "-" && nextCharacter === "+") {
+            stringToProcess = stringToProcess.slice(0, i) + "-" + stringToProcess.slice(i + 2);
+        } else if (thisCharacter === "-" && nextCharacter === "-") {
+            stringToProcess = stringToProcess.slice(0, i) + "+" + stringToProcess.slice(i + 2);
+        } else {
+            i++
+        }
+    }
+    console.log(`stringToProcess post processing for consecutive sum operators: ${stringToProcess}`)
+};
 
 const retrievePreviousValue = function(index) {
     let previousValue = "";
@@ -198,6 +220,121 @@ const divisionAndMultiplicationPass = function() {
     //cleanString();
     console.log(`Finished division and multiplication pass. stringToProcess: ${stringToProcess}`);
 };
+const additionAndSubtractionPass = function() {
+    let sum = 0;
+    let positiveStrings = [];
+    let negativeStrings = [];
+
+    if (operators.includes(stringToProcess[0])) {                       //Fix stringToProcess so that first value is correctly interpreted
+        stringToProcess = "0" + stringToProcess
+    } else {
+        stringToProcess = "0+" + stringToProcess
+    };
+
+    for (let index = 0; index < stringToProcess.length; index++) {      //Extract positive and negative strings
+        if (stringToProcess[index] === "+") {
+            positiveStrings.push(retrieveNextValue(index))
+        };
+        if (stringToProcess[index] === "-") {
+            negativeStrings.push(retrieveNextValue(index))
+        };
+    };
+
+    let positiveValues = [];                            //Convert strings to values
+    let negativeValues = [];
+    positiveStrings.forEach(string => {                 
+        let value;
+        if (!string.includes(".")) {
+            value = parseInt(string);
+        } else {
+            value = parseFloat(string);
+        };
+        positiveValues.push(value)
+    });
+    negativeStrings.forEach(string => {
+        let value;
+        if (!string.includes(".")) {
+            value = parseInt(string);
+        } else {
+            value = parseFloat(string);
+        };
+        negativeValues.push(value)
+    });
+
+    positiveValues.forEach(value => {                   //Calculate sum
+        sum += value;
+    });
+    negativeValues.forEach(value => {
+        sum -= value;
+    });
+
+    let finalString = sum.toString();
+    stringToProcess = finalString;
+    console.log(`Finished addition and subtraction pass. stringToProcess: ${stringToProcess}`);
+}
+
+
+const checkSyntax = function() {
+    console.log("________________________________________")
+    console.log(`Processing ${stringToProcess}...`);
+    if (stringToProcess[0] === "+" || stringToProcess[0] === "-") {             //Append 0 to start of string for processing strings starting with + or -
+        stringToProcess = "0" + stringToProcess;                                //Is this necessary? Already do this elsewhere - may remove later
+    };
+    if (dmOperators.includes(stringToProcess[0]) || operators.includes(stringToProcess[(stringToProcess.length - 1)])) { //Check if starts or ends with 
+        console.log("Syntax Error - stringToProcess begins or ends with an inappropriate operator");                     //inappropriate operators
+        stringToProcess = "Syntax Error!";
+    };
+    for (let i = 0; i < stringToProcess.length; i++) {
+        if (dmOperators.includes(stringToProcess[i]) && dmOperators.includes(stringToProcess[(i + 1)])) {      //Check for consecutive x or / operators
+            console.log("Syntax Error - stringToProcess contains two consecutive x or / operators")
+            stringToProcess = "Syntax Error!";
+        }
+    }
+    processConsecutiveSumOperators();                  //Process string to be able to handle multiple consecutive plus or minus operators
+}
+
+const calculateBodmas = function() {
+    divisionAndMultiplicationPass();
+    additionAndSubtractionPass();
+};
+const calculate = function() {
+    checkSyntax();
+    if (stringToProcess !== "Syntax Error!") {
+        calculateBodmas();
+    }
+    display.innerHTML = stringToProcess
+};
+
+const clearDisplay = function() {
+    stringToProcess = '';
+    display.innerHTML = '';
+};
+
+//Event Listeners
+zero.addEventListener('click', function() {addValue("0")});
+one.addEventListener('click', function() {addValue("1")});
+two.addEventListener('click', function() {addValue("2")});
+three.addEventListener('click', function() {addValue("3")});
+four.addEventListener('click', function() {addValue("4")});
+five.addEventListener('click', function() {addValue("5")});
+six.addEventListener('click', function() {addValue("6")});
+seven.addEventListener('click', function() {addValue("7")});
+eight.addEventListener('click', function() {addValue("8")});
+nine.addEventListener('click', function() {addValue("9")});
+
+decimal.addEventListener('click', function() {addValue(".")});
+
+plus.addEventListener('click', function() {addValue("+")});
+minus.addEventListener('click', function() {addValue("-")});
+times.addEventListener('click', function() {addValue("x")});
+slash.addEventListener('click', function() {addValue("/")});
+
+equals.addEventListener('click', calculate);
+clear.addEventListener('click', clearDisplay);
+
+
+
+/* Legacy Code kept in stasis
 
 const oldAdditionAndSubtractionPass = function() {
     let index = 0;
@@ -259,106 +396,4 @@ const oldAdditionAndSubtractionPass = function() {
     cleanString();
     console.log(`Finished addition and subtraction pass. stringToProcess: ${stringToProcess}`);
 };
-const additionAndSubtractionPass = function() {
-    let sum = 0;
-    let positiveStrings = [];
-    let negativeStrings = [];
-
-    if (operators.includes(stringToProcess[0])) {                       //Fix stringToProcess so that first value is correctly interpreted
-        stringToProcess = "0" + stringToProcess
-    } else {
-        stringToProcess = "0+" + stringToProcess
-    };
-
-    for (let index = 0; index < stringToProcess.length; index++) {      //Extract positive and negative strings
-        if (stringToProcess[index] === "+") {
-            positiveStrings.push(retrieveNextValue(index))
-        };
-        if (stringToProcess[index] === "-") {
-            negativeStrings.push(retrieveNextValue(index))
-        };
-    };
-
-    let positiveValues = [];
-    let negativeValues = [];
-    positiveStrings.forEach(string => {                 //Convert strings to values
-        let value;
-        if (!string.includes(".")) {
-            value = parseInt(string);
-        } else {
-            value = parseFloat(string);
-        };
-        positiveValues.push(value)
-    });
-    negativeStrings.forEach(string => {
-        let value;
-        if (!string.includes(".")) {
-            value = parseInt(string);
-        } else {
-            value = parseFloat(string);
-        };
-        negativeValues.push(value)
-    });
-
-    positiveValues.forEach(value => {                   //Calculate sum
-        sum += value;
-    });
-    negativeValues.forEach(value => {
-        sum -= value;
-    });
-
-    let finalString = sum.toString();
-    stringToProcess = finalString;
-    console.log(`Finished addition and subtraction pass. stringToProcess: ${stringToProcess}`);
-}
-
-
-const checkSyntax = function() {
-    console.log("________________________________________")
-    console.log(`Processing ${stringToProcess}...`);
-    if (stringToProcess[0] === "+" || stringToProcess[0] === "-") {
-        stringToProcess = "0" + stringToProcess;
-    };
-    if (stringToProcess[0] === "x" || stringToProcess[0] === "/" || operators.includes(stringToProcess[(stringToProcess.length - 1)])) {
-        stringToProcess = "Syntax Error!";
-    };
-}
-
-const calculateBodmas = function() {
-    divisionAndMultiplicationPass();
-    additionAndSubtractionPass();
-};
-const calculate = function() {
-    checkSyntax();
-    if (stringToProcess !== "Syntax Error!") {
-        calculateBodmas();
-    }
-    display.innerHTML = stringToProcess
-};
-
-const clearDisplay = function() {
-    stringToProcess = '';
-    display.innerHTML = '';
-};
-
-//Event Listeners
-zero.addEventListener('click', function() {addValue("0")});
-one.addEventListener('click', function() {addValue("1")});
-two.addEventListener('click', function() {addValue("2")});
-three.addEventListener('click', function() {addValue("3")});
-four.addEventListener('click', function() {addValue("4")});
-five.addEventListener('click', function() {addValue("5")});
-six.addEventListener('click', function() {addValue("6")});
-seven.addEventListener('click', function() {addValue("7")});
-eight.addEventListener('click', function() {addValue("8")});
-nine.addEventListener('click', function() {addValue("9")});
-
-decimal.addEventListener('click', function() {addValue(".")});
-
-plus.addEventListener('click', function() {addValue("+")});
-minus.addEventListener('click', function() {addValue("-")});
-times.addEventListener('click', function() {addValue("x")});
-slash.addEventListener('click', function() {addValue("/")});
-
-equals.addEventListener('click', calculate);
-clear.addEventListener('click', clearDisplay);
+*/
