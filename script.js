@@ -199,7 +199,7 @@ const divisionAndMultiplicationPass = function() {
     console.log(`Finished division and multiplication pass. stringToProcess: ${stringToProcess}`);
 };
 
-const additionAndSubtractionPass = function() {
+const oldAdditionAndSubtractionPass = function() {
     let index = 0;
 
     while (index < stringToProcess.length) {
@@ -250,13 +250,67 @@ const additionAndSubtractionPass = function() {
             stringToProcess = newStringToProcess;
             index = (firstSpliceIndex -1) + subtractedValueString.length + 1;  //Calculate where the index where the stringToProcess should be analyzed post calculation
             //console.log(`Index on the newStringToProcess to start again on = ${index}`)
+        } else if (stringToProcess[index] === "-" && index === 0) {
+            index++ //Delete if this branch of logic is not needed
         } else {
             index++
         }
     }
-    //cleanString();
+    cleanString();
     console.log(`Finished addition and subtraction pass. stringToProcess: ${stringToProcess}`);
 };
+const additionAndSubtractionPass = function() {
+    let sum = 0;
+    let positiveStrings = [];
+    let negativeStrings = [];
+
+    if (operators.includes(stringToProcess[0])) {                       //Fix stringToProcess so that first value is correctly interpreted
+        stringToProcess = "0" + stringToProcess
+    } else {
+        stringToProcess = "0+" + stringToProcess
+    };
+
+    for (let index = 0; index < stringToProcess.length; index++) {      //Extract positive and negative strings
+        if (stringToProcess[index] === "+") {
+            positiveStrings.push(retrieveNextValue(index))
+        };
+        if (stringToProcess[index] === "-") {
+            negativeStrings.push(retrieveNextValue(index))
+        };
+    };
+
+    let positiveValues = [];
+    let negativeValues = [];
+    positiveStrings.forEach(string => {                 //Convert strings to values
+        let value;
+        if (!string.includes(".")) {
+            value = parseInt(string);
+        } else {
+            value = parseFloat(string);
+        };
+        positiveValues.push(value)
+    });
+    negativeStrings.forEach(string => {
+        let value;
+        if (!string.includes(".")) {
+            value = parseInt(string);
+        } else {
+            value = parseFloat(string);
+        };
+        negativeValues.push(value)
+    });
+
+    positiveValues.forEach(value => {                   //Calculate sum
+        sum += value;
+    });
+    negativeValues.forEach(value => {
+        sum -= value;
+    });
+
+    let finalString = sum.toString();
+    stringToProcess = finalString;
+    console.log(`Finished addition and subtraction pass. stringToProcess: ${stringToProcess}`);
+}
 
 
 const checkSyntax = function() {
