@@ -28,8 +28,6 @@ const clear = document.getElementById("clear");
 const log = document.getElementById("log");
 
 //Global Variables
-let stringToProcess = '';
-
 const numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
 const operators = ["+", "-", "x", "/", "(", ")", "^"];
 const dmOperators = ["/", "x"];
@@ -94,7 +92,7 @@ const reverseString = function(str) {
     }
     return newString
 };
-const retrievePreviousValue = function(index) {
+const retrievePreviousValue = function(stringToProcess, index) {
     let previousValue = "";
     for (let i = index - 1; i >= 0; i--) {
         if (stringToProcess[i] === "-" && i === 0) {
@@ -109,7 +107,7 @@ const retrievePreviousValue = function(index) {
     previousValue = reverseString(previousValue);
     return previousValue
 };
-const retrieveNextValue = function(index) {
+const retrieveNextValue = function(stringToProcess, index) {
     let nextValue = "";
     for (let i = index + 1; i < stringToProcess.length; i++) {
         if (operators.includes(stringToProcess[i])) {
@@ -119,7 +117,7 @@ const retrieveNextValue = function(index) {
     };
     return nextValue
 };
-const retrieveFirstSpliceIndex = function(index) {
+const retrieveFirstSpliceIndex = function(stringToProcess, index) {
     let firstSpliceIndex = 0;
     for (let i = index - 1; i >= 0; i--) {
         if (operators.includes(stringToProcess[i])) {
@@ -129,7 +127,7 @@ const retrieveFirstSpliceIndex = function(index) {
     };
     return firstSpliceIndex
 };
-const retrieveSecondSpliceIndex = function(index) {
+const retrieveSecondSpliceIndex = function(stringToProcess, index) {
     let secondSpliceIndex;
     for (let i = index + 1; i < stringToProcess.length; i++) {
         if (operators.includes(stringToProcess[i])) {
@@ -153,22 +151,22 @@ const bracketsPass = function() {
         }
     }
 };
-const exponentialPass = function() {
+const exponentialPass = function(stringToProcess) {
     let index = 0;
 
     while (index < stringToProcess.length) {
         if (stringToProcess[index] === "^") {
             //Retrieve the two values and make the calculation
-            let valueOne = retrievePreviousValue(index);
-            let valueTwo = retrieveNextValue(index);
-            let firstSpliceIndex = retrieveFirstSpliceIndex(index);
-            let secondSpliceIndex = retrieveSecondSpliceIndex(index);
+            let valueOne = retrievePreviousValue(stringToProcess, index);
+            let valueTwo = retrieveNextValue(stringToProcess, index);
+            let firstSpliceIndex = retrieveFirstSpliceIndex(stringToProcess, index);
+            let secondSpliceIndex = retrieveSecondSpliceIndex(stringToProcess, index);
             let exponentialValue = exponential(valueOne, valueTwo);
-            console.log(`valueOne: ${valueOne}`);
-            console.log(`valueTwo: ${valueTwo}`);
-            console.log(`firstSpliceIndex: ${firstSpliceIndex}`);
-            console.log(`secondSpliceIndex: ${secondSpliceIndex}`);
-            console.log(`exponentialValue: ${exponentialValue}`);
+            //console.log(`valueOne: ${valueOne}`);
+            //console.log(`valueTwo: ${valueTwo}`);
+            //console.log(`firstSpliceIndex: ${firstSpliceIndex}`);
+            //console.log(`secondSpliceIndex: ${secondSpliceIndex}`);
+            //console.log(`exponentialValue: ${exponentialValue}`);
 
             //Modify string and place index at the correct place
             let exponentialValueString = exponentialValue.toString();  //Get the value to replace the calculation in the stringToProcess
@@ -178,8 +176,7 @@ const exponentialPass = function() {
                 secondStringPart = stringToProcess.slice(secondSpliceIndex);
             };
 
-            let newStringToProcess = firstStringPart + exponentialValueString + secondStringPart;
-            stringToProcess = newStringToProcess;
+            stringToProcess = firstStringPart + exponentialValueString + secondStringPart;
             index = (firstSpliceIndex -1) + exponentialValueString.length + 1;  //Calculate where the index where the stringToProcess should be analyzed post calculation
             //console.log(`Index on the newStringToProcess to start again on = ${index}`)
         } else {
@@ -187,19 +184,20 @@ const exponentialPass = function() {
         }
     }
 
-    console.log(`Finished exponential pass. stringToProcess: ${stringToProcess}`)
+    //console.log(`Finished exponential pass. stringToProcess: ${stringToProcess}`)
+    return stringToProcess
 };
-const divisionAndMultiplicationPass = function() {                              //NEED TO FIX DIVISION AND MULTIPLICATION WITH NEGATIVES
+const divisionAndMultiplicationPass = function(stringToProcess) {                              //NEED TO FIX DIVISION AND MULTIPLICATION WITH NEGATIVES
     let index = 0;
 
     while (index < stringToProcess.length) {
         //console.log(`Processing index: ${index}`);
         if (stringToProcess[index] === "/") {
             //Retrieve the two values and make the calculation
-            let valueOne = retrievePreviousValue(index);
-            let valueTwo = retrieveNextValue(index);
-            let firstSpliceIndex = retrieveFirstSpliceIndex(index);
-            let secondSpliceIndex = retrieveSecondSpliceIndex(index);
+            let valueOne = retrievePreviousValue(stringToProcess, index);
+            let valueTwo = retrieveNextValue(stringToProcess, index);
+            let firstSpliceIndex = retrieveFirstSpliceIndex(stringToProcess, index);
+            let secondSpliceIndex = retrieveSecondSpliceIndex(stringToProcess, index);
             let dividedValue = divide(valueOne, valueTwo);
 
             //Modify string and place index at the correct place
@@ -210,19 +208,15 @@ const divisionAndMultiplicationPass = function() {                              
                 secondStringPart = stringToProcess.slice(secondSpliceIndex);
             };
 
-            let newStringToProcess = firstStringPart + dividedValueString + secondStringPart;
-            stringToProcess = newStringToProcess;
+            stringToProcess = firstStringPart + dividedValueString + secondStringPart;
             index = (firstSpliceIndex -1) + dividedValueString.length + 1;  //Calculate where the index where the stringToProcess should be analyzed post calculation
             //console.log(`Index on the newStringToProcess to start again on = ${index}`)
         } else if (stringToProcess[index] === "x") {
             //Retrieve the two values and make the calculation
-            if (stringToProcess[index + 1] === "-") {
-
-            }
-            let valueOne = retrievePreviousValue(index);
-            let valueTwo = retrieveNextValue(index);
-            let firstSpliceIndex = retrieveFirstSpliceIndex(index);
-            let secondSpliceIndex = retrieveSecondSpliceIndex(index);
+            let valueOne = retrievePreviousValue(stringToProcess, index);
+            let valueTwo = retrieveNextValue(stringToProcess, index);
+            let firstSpliceIndex = retrieveFirstSpliceIndex(stringToProcess, index);
+            let secondSpliceIndex = retrieveSecondSpliceIndex(stringToProcess, index);
             let multipliedValue = multiply(valueOne, valueTwo);
 
             //Modify string and place index at the correct place
@@ -233,22 +227,22 @@ const divisionAndMultiplicationPass = function() {                              
                 secondStringPart = stringToProcess.slice(secondSpliceIndex);
             };
 
-            let newStringToProcess = firstStringPart + multipliedValueString + secondStringPart;
-            stringToProcess = newStringToProcess;
+            stringToProcess = firstStringPart + multipliedValueString + secondStringPart;
             index = (firstSpliceIndex -1) + multipliedValueString.length + 1;  //Calculate where the index where the stringToProcess should be analyzed post calculation
             //console.log(`Index on the newStringToProcess to start again on = ${index}`)
         } else {
             index++
         }
     }
-    console.log(`Finished division and multiplication pass. stringToProcess: ${stringToProcess}`);
+    //console.log(`Finished division and multiplication pass. stringToProcess: ${stringToProcess}`);
+    return stringToProcess
 };
-const additionAndSubtractionPass = function() {
+const additionAndSubtractionPass = function(stringToProcess) {
     let sum = 0;
     let positiveStrings = [];
     let negativeStrings = [];
 
-    if (operators.includes(stringToProcess[0])) {                       //Fix stringToProcess so that first value is correctly interpreted
+    if (operators.includes(stringToProcess[0])) {     //Fix stringToProcess so that first value is correctly interpreted               
         stringToProcess = "0" + stringToProcess
     } else {
         stringToProcess = "0+" + stringToProcess
@@ -256,10 +250,10 @@ const additionAndSubtractionPass = function() {
 
     for (let index = 0; index < stringToProcess.length; index++) {      //Extract positive and negative strings
         if (stringToProcess[index] === "+") {
-            positiveStrings.push(retrieveNextValue(index))
+            positiveStrings.push(retrieveNextValue(stringToProcess, index))
         };
         if (stringToProcess[index] === "-") {
-            negativeStrings.push(retrieveNextValue(index))
+            negativeStrings.push(retrieveNextValue(stringToProcess, index))
         };
     };
 
@@ -291,104 +285,123 @@ const additionAndSubtractionPass = function() {
         sum -= value;
     });
 
-    let finalString = sum.toString();
-    stringToProcess = finalString;
-    console.log(`Finished addition and subtraction pass. stringToProcess: ${stringToProcess}`);
+    stringToProcess = sum.toString();
+    //console.log(`Finished addition and subtraction pass. stringToProcess: ${stringToProcess}`);
+    return stringToProcess
 };
-const calculateBodmas = function() {
+const calculateBodmas = function(stringToProcess) {
     let initialString = stringToProcess;
-    exponentialPass();
-    divisionAndMultiplicationPass();
-    additionAndSubtractionPass();
+    //console.log(`Calculating BODMAS calculations for ${stringToProcess}...`)
+
+    stringToProcess = exponentialPass(stringToProcess);
+    stringToProcess = divisionAndMultiplicationPass(stringToProcess);
+    stringToProcess = additionAndSubtractionPass(stringToProcess);
+
     let calculatedString = stringToProcess;
+    logCalculation(initialString, calculatedString);
+    return stringToProcess
+};
+
+//Syntax Logic
+const processStartingSumOperators = function(string) {
+    if (string[0] === "+" || string[0] === "-") {             //Append 0 to start of string for processing strings starting with + or -
+        string = "0" + string;                                //Is this necessary? Already do this elsewhere - may remove later
+    };
+    return string
+};
+const processInappropriateStartOrEndOperators = function(string) {
+    if (dmOperators.includes(string[0]) || operators.includes(string[(string.length - 1)])) { //Check if starts or ends with 
+        //console.log("Syntax Error - stringToProcess begins or ends with an inappropriate operator");                     //inappropriate operators
+        string = "Syntax Error!";
+    };
+    return string
+};
+const processInappropriateConsecutiveOperators = function(string) {
+    for (let i = 0; i < string.length; i++) {
+        if (dmOperators.includes(string[i]) && dmOperators.includes(string[(i + 1)])) {      //Check for consecutive x or / operators
+            //console.log("Syntax Error - stringToProcess contains two consecutive x or / operators")
+            string = "Syntax Error!";
+        }
+        return string
+    };
+};
+const processConsecutiveSumOperators = function(string) {
+    let i = 0;
+    while (i < string.length - 1) {
+        let thisCharacter = string[i];
+        let nextCharacter = string[i + 1];
+        if (thisCharacter === "+" && nextCharacter === "+") {
+            string = string.slice(0, i) + "+" + string.slice(i + 2); 
+        } else if (thisCharacter === "+" && nextCharacter === "-") {
+            string = string.slice(0, i) + "-" + string.slice(i + 2);
+        } else if (thisCharacter === "-" && nextCharacter === "+") {
+            string = string.slice(0, i) + "-" + string.slice(i + 2);
+        } else if (thisCharacter === "-" && nextCharacter === "-") {
+            string = string.slice(0, i) + "+" + string.slice(i + 2);
+        } else {
+            i++
+        }
+    }
+    return string
+};
+const processMultipleDecimalsInValue = function(string) {
+    let numDecimalInOneValue = 0;
+    for (let i = 0; i < string.length; i++) {
+        if (string[i] === ".") {
+            numDecimalInOneValue++
+        } else if (operators.includes(string[i])) {
+            numDecimalInOneValue = 0;
+            continue
+        }
+        if (numDecimalInOneValue > 1) {
+            string = "Syntax Error!";
+            //console.log("Syntax Error - stringToProcess has more than one decimal in a value")
+            break
+        }
+
+    }
+    return string
+};
+const checkSyntax = function(stringToProcess) {
+    //console.log("________________________________________")
+    //console.log(`Processing ${stringToProcess}...`);
+    //console.log("Checking Syntax...")
+    stringToProcess = processStartingSumOperators(stringToProcess);
+    stringToProcess = processInappropriateStartOrEndOperators(stringToProcess);
+    stringToProcess = processInappropriateConsecutiveOperators(stringToProcess);
+    stringToProcess = processConsecutiveSumOperators(stringToProcess);   //Process string to be able to handle multiple consecutive plus or minus operators
+    stringToProcess = processMultipleDecimalsInValue(stringToProcess);
+    //console.log(`Checked syntax stringToProcess is now: ${stringToProcess}`);
+    return stringToProcess                  
+};
+
+//Calculator Interface Logic
+const addValueToDisplay = function(value) {
+    if (display.innerText == "Calculation rendered here...") {
+        display.innerText = ''
+    };
+    display.innerHTML += value;
+    return
+};
+const logCalculation = function(initialString, calculatedString) {
     let stringToLog = initialString + "=" + calculatedString;
     let elementToDisplay = document.createElement("P");
     elementToDisplay.innerHTML = stringToLog;
     log.insertBefore(elementToDisplay, log.firstChild);
 };
-
-//Syntax Logic
-const processStartingSumOperators = function() {
-    if (stringToProcess[0] === "+" || stringToProcess[0] === "-") {             //Append 0 to start of string for processing strings starting with + or -
-        stringToProcess = "0" + stringToProcess;                                //Is this necessary? Already do this elsewhere - may remove later
-    };
-};
-const processInappropriateStartOrEndOperators = function() {
-    if (dmOperators.includes(stringToProcess[0]) || operators.includes(stringToProcess[(stringToProcess.length - 1)])) { //Check if starts or ends with 
-        console.log("Syntax Error - stringToProcess begins or ends with an inappropriate operator");                     //inappropriate operators
-        stringToProcess = "Syntax Error!";
-    };
-};
-const processInappropriateConsecutiveOperators = function() {
-    for (let i = 0; i < stringToProcess.length; i++) {
-        if (dmOperators.includes(stringToProcess[i]) && dmOperators.includes(stringToProcess[(i + 1)])) {      //Check for consecutive x or / operators
-            console.log("Syntax Error - stringToProcess contains two consecutive x or / operators")
-            stringToProcess = "Syntax Error!";
-        }
-    };
-};
-const processConsecutiveSumOperators = function() {
-    console.log("Processing string for consecutive sum operators...")
-    let i = 0;
-    while (i < stringToProcess.length - 1) {
-        let thisCharacter = stringToProcess[i];
-        let nextCharacter = stringToProcess[i + 1];
-        if (thisCharacter === "+" && nextCharacter === "+") {
-            stringToProcess = stringToProcess.slice(0, i) + "+" + stringToProcess.slice(i + 2); 
-        } else if (thisCharacter === "+" && nextCharacter === "-") {
-            stringToProcess = stringToProcess.slice(0, i) + "-" + stringToProcess.slice(i + 2);
-        } else if (thisCharacter === "-" && nextCharacter === "+") {
-            stringToProcess = stringToProcess.slice(0, i) + "-" + stringToProcess.slice(i + 2);
-        } else if (thisCharacter === "-" && nextCharacter === "-") {
-            stringToProcess = stringToProcess.slice(0, i) + "+" + stringToProcess.slice(i + 2);
-        } else {
-            i++
-        }
-    }
-    console.log(`stringToProcess post processing for consecutive sum operators: ${stringToProcess}`)
-};
-const processMultipleDecimalsInValue = function() {
-    let numDecimalInOneValue = 0;
-    for (let i = 0; i < stringToProcess.length; i++) {
-        if (stringToProcess[i] === ".") {
-            numDecimalInOneValue++
-        } else if (operators.includes(stringToProcess[i])) {
-            numDecimalInOneValue = 0;
-            continue
-        }
-        if (numDecimalInOneValue > 1) {
-            stringToProcess = "Syntax Error!";
-            console.log("Syntax Error - stringToProcess has more than one decimal in a value")
-            break
-        }
-
-    }
-};
-const checkSyntax = function() {
-    console.log("________________________________________")
-    console.log(`Processing ${stringToProcess}...`);
-    processStartingSumOperators();
-    processInappropriateStartOrEndOperators();
-    processInappropriateConsecutiveOperators();
-    processConsecutiveSumOperators();   //Process string to be able to handle multiple consecutive plus or minus operators
-    processMultipleDecimalsInValue();                  
-};
-
-//Calculator Interface Logic
-const addValueToDisplay = function(value) {
-    stringToProcess += value;
-    display.innerHTML = stringToProcess;
-    return
-};
-const calculate = function() {
-    checkSyntax();
-    if (stringToProcess !== "Syntax Error!") {
-        calculateBodmas(stringToProcess);
-    }
+const executeCalculation = function() {
+    let stringToProcess = display.innerHTML;
+    stringToProcess = calculate(stringToProcess)
     display.innerHTML = stringToProcess
 };
+const calculate = function(stringToProcess) {
+    stringToProcess = checkSyntax(stringToProcess);
+    if (stringToProcess !== "Syntax Error!") {
+        stringToProcess = calculateBodmas(stringToProcess);
+    }
+    return stringToProcess
+}
 const clearDisplay = function() {
-    stringToProcess = '';
     display.innerHTML = 'Calculation rendered here...';
 };
 
@@ -412,5 +425,42 @@ times.addEventListener('click', function() {addValueToDisplay("x")});
 slash.addEventListener('click', function() {addValueToDisplay("/")});
 powerOf.addEventListener('click', function() {addValueToDisplay("^")});
 
-equals.addEventListener('click', calculate);
+equals.addEventListener('click', executeCalculation);
 clear.addEventListener('click', clearDisplay);
+
+//Testing Suite - Who needs mocha anyway?//
+console.log("________________________");
+console.log("Execute testing suite...");
+
+console.log(`x2+2 should equal Syntax Error! -      x2+2=${calculate("x2+2")}          ${calculate("x2+2") === "Syntax Error!"}`);
+console.log(`2+2x should equal Syntax Error! -      2+2x=${calculate("2+2x")}          ${calculate("2+2x") === "Syntax Error!"}`);
+console.log(`2+2x should equal Syntax Error! -      2+2x=${calculate("2+2x")}          ${calculate("2+2x") === "Syntax Error!"}`);
+console.log(`2.2.2+2 should equal Syntax Error! -   2.2.2+2=${calculate("2.2.2+2")}       ${calculate("2.2.2+2") === "Syntax Error!"}`);
+
+console.log(`2+2 should equal 4 -      2+2=${calculate("2+2")}          ${calculate("2+2") === "4"}`);
+console.log(`2-1 should equal 1 -      2-1=${calculate("2-1")}          ${calculate("2-1") === "1"}`);
+console.log(`2x2 should equal 4 -      2x2=${calculate("2x2")}          ${calculate("2x2") === "4"}`);
+console.log(`2/2 should equal 1 -      2/2=${calculate("2/2")}          ${calculate("2/2") === "1"}`);
+
+console.log(`1/2 should equal 0.5 -    1/2=${calculate("1/2")}        ${calculate("1/2") === "0.5"}`);
+console.log(`0.5+0.75 equals 0.5 -     0.5+0.75=${calculate("0.5+0.75")}  ${calculate("0.5+0.75") === "1.25"}`);
+console.log(`-2+1 should equal -1 -    -2+1=${calculate("-2+1")}        ${calculate("-2+1") === "-1"}`);
+console.log(`-2+3 should equal 1 -     -2+3=${calculate("-2+3")}         ${calculate("-2+3") === "1"}`);
+console.log(`-2-5 should equal -7 -    -2-5=${calculate("-2-5")}        ${calculate("-2-5") === "-7"}`);
+
+console.log(`-2--5 should equal 3 -    -2--5=${calculate("-2--5")}        ${calculate("-2--5") === "3"}`);
+console.log(`--2--5 should equal 7 -   --2--5=${calculate("--2--5")}       ${calculate("--2--5") === "7"}`);
+console.log(`-+-2-+5 should equal -3 - -+-2-+5=${calculate("-+-2-+5")}     ${calculate("-+-2-+5") === "-3"}`);
+
+console.log(`-2x2 should equal -4 -    -2x2=${calculate("-2x2")}        ${calculate("-2x2") === "-4"}`);
+console.log(`-2/2 should equal -1 -    -2/2=${calculate("-2/2")}        ${calculate("-2/2") === "-1"}`);
+console.log(`2x-2 should equal -4 -    2x-2=${calculate("2x-2")}        ${calculate("2x-2") === "-4"}`);
+console.log(`-2x-2 should equal 4 -    -2x-2=${calculate("-2x-2")}       ${calculate("-2x-2") === "4"}`);
+
+console.log(`3/-3 should equal -1 -    3/-3=${calculate("3/-3")}       ${calculate("3/-3") === "-1"}`);
+console.log(`-3/-3 should equal 1 -    -3/-3=${calculate("-3/-3")}      ${calculate("-3/-3") === "1"}`);
+console.log(`3^3 should equal 27 -     3^3=${calculate("3^3")}         ${calculate("3^3") === "27"}`);
+console.log(`-3^3 should equal -27 -   -3^3=${calculate("3^3")}        ${calculate("-3^3") === "-27"}`);
+console.log(`3^-3 should equal -27 -   3^-3=${calculate("3^-3")}        ${calculate("3^-3") === "-27"}`);
+
+
