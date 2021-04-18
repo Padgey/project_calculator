@@ -210,7 +210,7 @@ const exponentialPass = function(stringToProcess) {
 
     console.log(`Finished exponential pass. stringToProcess: ${stringToProcess}`)
 };
-const divisionAndMultiplicationPass = function(stringToProcess) {                              //REFACTOR to have one line to check / or x - too much duplicate code
+const divisionAndMultiplicationPass = function(stringToProcess) {                              //About to REFACTOR to have one line to check / or x - too much duplicate code
     let index = 0;
 
     while (index < stringToProcess.length) {
