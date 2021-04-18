@@ -210,276 +210,71 @@ const exponentialPass = function(stringToProcess) {
 
     console.log(`Finished exponential pass. stringToProcess: ${stringToProcess}`)
 };
-const divisionAndMultiplicationPass = function(stringToProcess) {                              //About to REFACTOR to have one line to check / or x - too much duplicate code
+const divisionAndMultiplicationPass = function(stringToProcess) {
     let index = 0;
 
     while (index < stringToProcess.length) {
         //console.log(`Processing index: ${index}`);
-        if (stringToProcess[index] === "/") {
+        if (stringToProcess[index] === "/" || stringToProcess[index] === "x") {
              //Check if either of the values is negative
              let valueOneIsNegative = previousValueIsNegative(stringToProcess, index);
              let valueTwoIsNegative = nextValueIsNegative(stringToProcess, index);
              //console.log(`valueOneIsNegative: ${valueOneIsNegative}`);
              //console.log(`valueTwoIsNegative: ${valueTwoIsNegative}`);
  
-             if (valueOneIsNegative === false && valueTwoIsNegative === false) {
- 
-                 //console.log("Following first path for multiplication: positive x positive");
-                 let valueOne = retrievePreviousValue(stringToProcess, index);
-                 let valueTwo = retrieveNextValue(stringToProcess, index);
-                 let firstSpliceIndex = retrieveFirstSpliceIndex(stringToProcess, index);
-                 let secondSpliceIndex = retrieveSecondSpliceIndex(stringToProcess, index);
-                 let dividedValue = divide(valueOne, valueTwo);
-
-                 console.log(`valueOne: ${valueOne}`);
-                 console.log(`valueTwo: ${valueTwo}`);
-                 console.log(`firstSpliceIndex: ${firstSpliceIndex}`);
-                 console.log(`secondSpliceIndex: ${secondSpliceIndex}`);
-                 console.log(`dividedValue: ${dividedValue}`);
- 
-                 let dividedValueString = dividedValue.toString();  //Get the value to replace the calculation in the stringToProcess
-                 let firstStringPart = stringToProcess.slice(0, firstSpliceIndex);
-                 let secondStringPart = '';
-                 //This ensures that it doesn't look for another operator afterwards if there isn't one
-                 if (secondSpliceIndex) {        
-                     secondStringPart = stringToProcess.slice(secondSpliceIndex);
-                 };
- 
-                 let newStringToProcess = firstStringPart + "+" + dividedValueString + secondStringPart;
-                 stringToProcess = newStringToProcess;
-
-                 console.log(stringToProcess);
-                 index = (firstSpliceIndex -1) + dividedValueString.length + 1;
-                 //console.log(`Index on the newStringToProcess to start again on = ${index}`)
-             } else if (valueOneIsNegative === true && valueTwoIsNegative === false) {
- 
-                 console.log("Following second path for multiplication: negative x positive");
-                 let valueOne = retrievePreviousValue(stringToProcess, index);
-                 let valueTwo = retrieveNextValue(stringToProcess, index);
-                 let firstSpliceIndex = retrieveFirstSpliceIndex(stringToProcess, index);
-                 let secondSpliceIndex = retrieveSecondSpliceIndex(stringToProcess, index);
-                 let dividedValue = divide(valueOne, valueTwo);
-
-                 console.log(`valueOne: ${valueOne}`);
-                 console.log(`valueTwo: ${valueTwo}`);
-                 console.log(`firstSpliceIndex: ${firstSpliceIndex}`);
-                 console.log(`secondSpliceIndex: ${secondSpliceIndex}`);
-                 console.log(`dividedValue: ${dividedValue}`);
- 
-                 let dividedValueString = dividedValue.toString();  //Get the value to replace the calculation in the stringToProcess
-                 let firstStringPart = stringToProcess.slice(0, firstSpliceIndex);
-                 let secondStringPart = '';
-                 //This ensures that it doesn't look for another operator afterwards if there isn't one
-                 if (secondSpliceIndex) {        
-                     secondStringPart = stringToProcess.slice(secondSpliceIndex);
-                 };
- 
-                 console.log(`firstStringPart: ${firstStringPart}`);
-                 console.log(`dividedValueString: ${dividedValueString}`);
-                 console.log(`secondStringPart: ${secondStringPart}`);
-                 let newStringToProcess = firstStringPart + "-" + dividedValueString + secondStringPart;
-                 stringToProcess = newStringToProcess;
-
-                 console.log(stringToProcess);
-                 index = (firstSpliceIndex -1) + dividedValueString.length + 1;
-                 //console.log(`Index on the newStringToProcess to start again on = ${index}`)
-             } else if (valueOneIsNegative === false && valueTwoIsNegative === true) {
- 
-                 console.log("Following third path for multiplication: positive x negative");
-                 let valueOne = retrievePreviousValue(stringToProcess, index);
-                 let valueTwo = retrieveNextValue(stringToProcess, index + 1);                       //INDEX + 1 as nextValue will be negative so need to next character will be "-"
-                 let firstSpliceIndex = retrieveFirstSpliceIndex(stringToProcess, index);
-                 let secondSpliceIndex = retrieveSecondSpliceIndex(stringToProcess, index + 1);
-                 let dividedValue = divide(valueOne, valueTwo);
- 
-                 console.log(`valueOne: ${valueOne}`);
-                 console.log(`valueTwo: ${valueTwo}`);
-                 console.log(`firstSpliceIndex: ${firstSpliceIndex}`);
-                 console.log(`secondSpliceIndex: ${secondSpliceIndex}`);
-                 console.log(`dividedValue: ${dividedValue}`);
- 
-                 let dividedValueString = dividedValue.toString();  //Get the value to replace the calculation in the stringToProcess
-                 let firstStringPart = stringToProcess.slice(0, firstSpliceIndex);
-                 let secondStringPart = '';
-                 //This ensures that it doesn't look for another operator afterwards if there isn't one
-                 if (secondSpliceIndex) {        
-                     secondStringPart = stringToProcess.slice(secondSpliceIndex);
-                 };
- 
-                 console.log(`firstStringPart: ${firstStringPart}`);
-                 console.log(`dividedValueString: ${dividedValueString}`);
-                 console.log(`secondStringPart: ${secondStringPart}`);
- 
-                 let newStringToProcess = firstStringPart + "-" + dividedValueString + secondStringPart;
-                 stringToProcess = newStringToProcess;
-
-                 console.log(stringToProcess);
-                 index = (firstSpliceIndex -1) + dividedValueString.length + 1;
-                 //console.log(`Index on the newStringToProcess to start again on = ${index}`)
-             } else {
-
-                 console.log("Following fourth path for multiplication: negative x negative");
-                 let valueOne = retrievePreviousValue(stringToProcess, index);
-                 let valueTwo = retrieveNextValue(stringToProcess, index + 1);
-                 let firstSpliceIndex = retrieveFirstSpliceIndex(stringToProcess, index);
-                 let secondSpliceIndex = retrieveSecondSpliceIndex(stringToProcess, index + 1);
-                 let dividedValue = divide(valueOne, valueTwo);
-
-                 console.log(`valueOne: ${valueOne}`);
-                 console.log(`valueTwo: ${valueTwo}`);
-                 console.log(`firstSpliceIndex: ${firstSpliceIndex}`);
-                 console.log(`secondSpliceIndex: ${secondSpliceIndex}`);
-                 console.log(`dividedValue: ${dividedValue}`);
- 
-                 let dividedValueString = dividedValue.toString();  //Get the value to replace the calculation in the stringToProcess
-                 let firstStringPart = stringToProcess.slice(0, firstSpliceIndex);
-                 let secondStringPart = '';
-                 //This ensures that it doesn't look for another operator afterwards if there isn't one
-                 if (secondSpliceIndex) {        
-                     secondStringPart = stringToProcess.slice(secondSpliceIndex);
-                 };
- 
-                 let newStringToProcess = firstStringPart + "+" + dividedValueString + secondStringPart;
-                 stringToProcess = newStringToProcess;
-
-                 console.log(stringToProcess);
-                 index = (firstSpliceIndex -1) + dividedValueString.length + 1;
-             }
-        } else if (stringToProcess[index] === "x") {
-            //Check if either of the values is negative
-            let valueOneIsNegative = previousValueIsNegative(stringToProcess, index);
-            let valueTwoIsNegative = nextValueIsNegative(stringToProcess, index);
-            console.log(`valueOneIsNegative: ${valueOneIsNegative}`);
-            console.log(`valueTwoIsNegative: ${valueTwoIsNegative}`);
-
-
-            if (valueOneIsNegative === false && valueTwoIsNegative === false) {
-
-                console.log("Following first path for multiplication: positive x positive");
-                let valueOne = retrievePreviousValue(stringToProcess, index);
-                let valueTwo = retrieveNextValue(stringToProcess, index);
-                let firstSpliceIndex = retrieveFirstSpliceIndex(stringToProcess, index);
-                let secondSpliceIndex = retrieveSecondSpliceIndex(stringToProcess, index);
-                let multipliedValue = multiply(valueOne, valueTwo);
-
-                console.log(`valueOne: ${valueOne}`);
-                console.log(`valueTwo: ${valueTwo}`);
-                console.log(`firstSpliceIndex: ${firstSpliceIndex}`);
-                console.log(`secondSpliceIndex: ${secondSpliceIndex}`);
-                console.log(`multipliedValue: ${multipliedValue}`);
-
-                let multipliedValueString = multipliedValue.toString();  //Get the value to replace the calculation in the stringToProcess
-                let firstStringPart = stringToProcess.slice(0, firstSpliceIndex);
-                let secondStringPart = '';
-                //This ensures that it doesn't look for another operator afterwards if there isn't one
-                if (secondSpliceIndex) {        
-                    secondStringPart = stringToProcess.slice(secondSpliceIndex);
-                };
-
-                let newStringToProcess = firstStringPart + "+" + multipliedValueString + secondStringPart;
-                stringToProcess = newStringToProcess;
-
-                console.log(stringToProcess);
-                index = (firstSpliceIndex -1) + multipliedValueString.length + 1;
-                //console.log(`Index on the newStringToProcess to start again on = ${index}`)
-            } else if (valueOneIsNegative === true && valueTwoIsNegative === false) {
-
-                console.log("Following second path for multiplication: negative x positive");
-                let valueOne = retrievePreviousValue(stringToProcess, index);
-                let valueTwo = retrieveNextValue(stringToProcess, index);
-                let firstSpliceIndex = retrieveFirstSpliceIndex(stringToProcess, index);
-                let secondSpliceIndex = retrieveSecondSpliceIndex(stringToProcess, index);
-                let multipliedValue = multiply(valueOne, valueTwo);
-
-                console.log(`valueOne: ${valueOne}`);
-                console.log(`valueTwo: ${valueTwo}`);
-                console.log(`firstSpliceIndex: ${firstSpliceIndex}`);
-                console.log(`secondSpliceIndex: ${secondSpliceIndex}`);
-                console.log(`multipliedValue: ${multipliedValue}`);
-
-                let multipliedValueString = multipliedValue.toString();  //Get the value to replace the calculation in the stringToProcess
-                let firstStringPart = stringToProcess.slice(0, firstSpliceIndex);
-                let secondStringPart = '';
-                //This ensures that it doesn't look for another operator afterwards if there isn't one
-                if (secondSpliceIndex) {        
-                    secondStringPart = stringToProcess.slice(secondSpliceIndex);
-                };
-
-                console.log(`firstStringPart: ${firstStringPart}`);
-                console.log(`multipliedValueString: ${multipliedValueString}`);
-                console.log(`secondStringPart: ${secondStringPart}`);
-                let newStringToProcess = firstStringPart + "-" + multipliedValueString + secondStringPart;
-                stringToProcess = newStringToProcess;
-
-                console.log(stringToProcess);
-                index = (firstSpliceIndex -1) + multipliedValueString.length + 1;
-                //console.log(`Index on the newStringToProcess to start again on = ${index}`)
-            } else if (valueOneIsNegative === false && valueTwoIsNegative === true) {
-
-                console.log("Following third path for multiplication: positive x negative");
-                let valueOne = retrievePreviousValue(stringToProcess, index);
-                let valueTwo = retrieveNextValue(stringToProcess, index + 1);                       //INDEX + 1 as nextValue will be negative so need to next character will be "-"
-                let firstSpliceIndex = retrieveFirstSpliceIndex(stringToProcess, index);
-                let secondSpliceIndex = retrieveSecondSpliceIndex(stringToProcess, index + 1);
-                let multipliedValue = multiply(valueOne, valueTwo);
-
-                console.log(`valueOne: ${valueOne}`);
-                console.log(`valueTwo: ${valueTwo}`);
-                console.log(`firstSpliceIndex: ${firstSpliceIndex}`);
-                console.log(`secondSpliceIndex: ${secondSpliceIndex}`);
-                console.log(`multipliedValue: ${multipliedValue}`);
-
-                let multipliedValueString = multipliedValue.toString();  //Get the value to replace the calculation in the stringToProcess
-                let firstStringPart = stringToProcess.slice(0, firstSpliceIndex);
-                let secondStringPart = '';
-                //This ensures that it doesn't look for another operator afterwards if there isn't one
-                if (secondSpliceIndex) {        
-                    secondStringPart = stringToProcess.slice(secondSpliceIndex);
-                };
-
-                console.log(`firstStringPart: ${firstStringPart}`);
-                console.log(`multipliedValueString: ${multipliedValueString}`);
-                console.log(`secondStringPart: ${secondStringPart}`);
-
-                let newStringToProcess = firstStringPart + "-" + multipliedValueString + secondStringPart;
-                stringToProcess = newStringToProcess;
-
-                console.log(stringToProcess);
-                index = (firstSpliceIndex -1) + multipliedValueString.length + 1;
-                //console.log(`Index on the newStringToProcess to start again on = ${index}`)
+            let valueOne = retrievePreviousValue(stringToProcess, index);
+            let valueTwo;
+            if (valueTwoIsNegative) {
+                valueTwo = retrieveNextValue(stringToProcess, index + 1);
             } else {
+                valueTwo = retrieveNextValue(stringToProcess, index);
+            };
 
-                console.log("Following fourth path for multiplication: negative x negative");
-                let valueOne = retrievePreviousValue(stringToProcess, index);
-                let valueTwo = retrieveNextValue(stringToProcess, index + 1);
-                let firstSpliceIndex = retrieveFirstSpliceIndex(stringToProcess, index);
-                let secondSpliceIndex = retrieveSecondSpliceIndex(stringToProcess, index + 1);
-                let multipliedValue = multiply(valueOne, valueTwo);
+            let firstSpliceIndex = retrieveFirstSpliceIndex(stringToProcess, index);
+            let secondSpliceIndex;
+            if (valueTwoIsNegative) {
+                secondSpliceIndex = retrieveSecondSpliceIndex(stringToProcess, index + 1);
+            } else {
+                secondSpliceIndex = retrieveSecondSpliceIndex(stringToProcess, index);
+            };
 
-                console.log(`valueOne: ${valueOne}`);
-                console.log(`valueTwo: ${valueTwo}`);
-                console.log(`firstSpliceIndex: ${firstSpliceIndex}`);
-                console.log(`secondSpliceIndex: ${secondSpliceIndex}`);
-                console.log(`multipliedValue: ${multipliedValue}`);
+            let operatedValue;
+            if (stringToProcess[index] === "/") {
+                operatedValue = divide(valueOne, valueTwo);
+            } else {
+                operatedValue = multiply(valueOne, valueTwo);
+            };
 
-                let multipliedValueString = multipliedValue.toString();  //Get the value to replace the calculation in the stringToProcess
-                let firstStringPart = stringToProcess.slice(0, firstSpliceIndex);
-                let secondStringPart = '';
-                //This ensures that it doesn't look for another operator afterwards if there isn't one
-                if (secondSpliceIndex) {        
-                    secondStringPart = stringToProcess.slice(secondSpliceIndex);
-                };
+            //console.log(`valueOne: ${valueOne}`);
+            //console.log(`valueTwo: ${valueTwo}`);
+            //console.log(`firstSpliceIndex: ${firstSpliceIndex}`);
+            //console.log(`secondSpliceIndex: ${secondSpliceIndex}`);
+            //console.log(`operatedValue: ${operatedValue}`);
+ 
+            let operatedValueString = operatedValue.toString();  //Get the value to replace the calculation in the stringToProcess
+            let firstStringPart = stringToProcess.slice(0, firstSpliceIndex);
+            let secondStringPart = '';
+            //This ensures that it doesn't look for another operator afterwards if there isn't one
+            if (secondSpliceIndex) {        
+                secondStringPart = stringToProcess.slice(secondSpliceIndex);
+            };
 
-                let newStringToProcess = firstStringPart + "+" + multipliedValueString + secondStringPart;
-                stringToProcess = newStringToProcess;
+            if ((valueOneIsNegative === false && valueTwoIsNegative === false) || (valueOneIsNegative === true && valueTwoIsNegative === true)) {
+                stringToProcess = firstStringPart + "+" + operatedValueString + secondStringPart;
+            } else {
+                stringToProcess = firstStringPart + "-" + operatedValueString + secondStringPart;
+            };
+            //console.log(stringToProcess);
 
-                console.log(stringToProcess);
-                index = (firstSpliceIndex -1) + multipliedValueString.length + 1;
-            }
+            index = (firstSpliceIndex -1) + operatedValueString.length + 1;
+
         } else {
+
             index++
+
         }
-    }
+    };
+
     console.log(`Finished division and multiplication pass. stringToProcess: ${stringToProcess}`);
 
     return stringToProcess
