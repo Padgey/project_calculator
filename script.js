@@ -107,18 +107,13 @@ const retrievePreviousValue = function(stringToProcess, index) {
     return previousValue
 };
 const retrieveNextValue = function(stringToProcess, index) {
-    //console.log("Retrieving next value...");
     let nextValue = "";
-    //console.log(`nextValue: ${nextValue}`);
     for (let i = index + 1; i < stringToProcess.length; i++) {
-        //console.log(`stringToProcess[i]: ${stringToProcess[i]}`);
         if (operators.includes(stringToProcess[i])) {
             break
         };
-        //console.log(`${nextValue} + ${stringToProcess[i]}`);
         nextValue += stringToProcess[i];
     };
-    //console.log(`Final value retrieved: ${nextValue}`);
     return nextValue
 };
 const previousValueIsNegative = function(stringToProcess, index) {
@@ -178,37 +173,70 @@ const exponentialPass = function(stringToProcess) {
     let index = 0;
 
     while (index < stringToProcess.length) {
+        //console.log(`Processing index: ${index}`);
         if (stringToProcess[index] === "^") {
-            //Retrieve the two values and make the calculation
-            let valueOne = retrievePreviousValue(index);
-            let valueTwo = retrieveNextValue(index);
-            let firstSpliceIndex = retrieveFirstSpliceIndex(index);
-            let secondSpliceIndex = retrieveSecondSpliceIndex(index);
-            let exponentialValue = exponential(valueOne, valueTwo);
-            console.log(`valueOne: ${valueOne}`);
-            console.log(`valueTwo: ${valueTwo}`);
-            console.log(`firstSpliceIndex: ${firstSpliceIndex}`);
-            console.log(`secondSpliceIndex: ${secondSpliceIndex}`);
-            console.log(`exponentialValue: ${exponentialValue}`);
+             //Check if either of the values is negative
+             let valueOneIsNegative = previousValueIsNegative(stringToProcess, index);
+             let valueTwoIsNegative = nextValueIsNegative(stringToProcess, index);
+             //console.log(`valueOneIsNegative: ${valueOneIsNegative}`);
+             //console.log(`valueTwoIsNegative: ${valueTwoIsNegative}`);
+ 
+            let valueOne = retrievePreviousValue(stringToProcess, index);
+            let valueTwo;
+            if (valueTwoIsNegative) {
+                valueTwo = retrieveNextValue(stringToProcess, index + 1);
+            } else {
+                valueTwo = retrieveNextValue(stringToProcess, index);
+            };
 
-            //Modify string and place index at the correct place
-            let exponentialValueString = exponentialValue.toString();  //Get the value to replace the calculation in the stringToProcess
+            let firstSpliceIndex = retrieveFirstSpliceIndex(stringToProcess, index);
+            let secondSpliceIndex;
+            if (valueTwoIsNegative) {
+                secondSpliceIndex = retrieveSecondSpliceIndex(stringToProcess, index + 1);
+            } else {
+                secondSpliceIndex = retrieveSecondSpliceIndex(stringToProcess, index);
+            };
+
+            let operatedValue;
+            operatedValue = exponential(valueOne, valueTwo);
+
+            if (valueTwoIsNegative) {
+                operatedValue = 1 / operatedValue;
+            };
+
+            //console.log(`valueOne: ${valueOne}`);
+            //console.log(`valueTwo: ${valueTwo}`);
+            //console.log(`firstSpliceIndex: ${firstSpliceIndex}`);
+            //console.log(`secondSpliceIndex: ${secondSpliceIndex}`);
+            //console.log(`operatedValue: ${operatedValue}`);
+ 
+            let operatedValueString = operatedValue.toString();  //Get the value to replace the calculation in the stringToProcess
             let firstStringPart = stringToProcess.slice(0, firstSpliceIndex);
             let secondStringPart = '';
-            if (secondSpliceIndex) {        //This ensures that it doesn't look for another operator afterwards if there isn't one
+            //This ensures that it doesn't look for another operator afterwards if there isn't one
+            if (secondSpliceIndex) {        
                 secondStringPart = stringToProcess.slice(secondSpliceIndex);
             };
 
-            let newStringToProcess = firstStringPart + exponentialValueString + secondStringPart;
-            stringToProcess = newStringToProcess;
-            index = (firstSpliceIndex -1) + exponentialValueString.length + 1;  //Calculate where the index where the stringToProcess should be analyzed post calculation
-            //console.log(`Index on the newStringToProcess to start again on = ${index}`)
-        } else {
-            index++
-        }
-    }
+            if (valueOneIsNegative === false) {
+                stringToProcess = firstStringPart + "+" + operatedValueString + secondStringPart;
+            } else {
+                stringToProcess = firstStringPart + "-" + operatedValueString + secondStringPart;
+            }
+            //console.log(stringToProcess);
 
-    console.log(`Finished exponential pass. stringToProcess: ${stringToProcess}`)
+            index = (firstSpliceIndex -1) + operatedValueString.length + 1;
+
+        } else {
+
+            index++
+
+        }
+    };
+
+    console.log(`Finished division and multiplication pass. stringToProcess: ${stringToProcess}`);
+
+    return stringToProcess
 };
 const divisionAndMultiplicationPass = function(stringToProcess) {
     let index = 0;
@@ -350,7 +378,7 @@ const additionAndSubtractionPass = function(stringToProcess) {
 const calculateBodmas = function(stringToProcess) {
     let initialString = stringToProcess;
 
-    //exponentialPass(stringToProcess);
+    stringToProcess = exponentialPass(stringToProcess);
     stringToProcess = divisionAndMultiplicationPass(stringToProcess);
     stringToProcess = additionAndSubtractionPass(stringToProcess);
 
