@@ -588,3 +588,45 @@ rightBracket.addEventListener('click', function() {addValueToDisplay(")")});
 
 equals.addEventListener('click', executeCalculation);
 clear.addEventListener('click', clearDisplay);
+
+document.addEventListener('keydown', (event) => {if(event.key === "0") {addValueToDisplay("0")}});
+document.addEventListener('keydown', (event) => {if(event.key === "1") {addValueToDisplay("1")}});
+document.addEventListener('keydown', (event) => {if(event.key === "2") {addValueToDisplay("2")}});
+document.addEventListener('keydown', (event) => {if(event.key === "3") {addValueToDisplay("3")}});
+document.addEventListener('keydown', (event) => {if(event.key === "4") {addValueToDisplay("4")}});
+document.addEventListener('keydown', (event) => {if(event.key === "5") {addValueToDisplay("5")}});
+document.addEventListener('keydown', (event) => {if(event.key === "6") {addValueToDisplay("6")}});
+document.addEventListener('keydown', (event) => {if(event.key === "7") {addValueToDisplay("7")}});
+document.addEventListener('keydown', (event) => {if(event.key === "8") {addValueToDisplay("8")}});
+document.addEventListener('keydown', (event) => {if(event.key === "9") {addValueToDisplay("9")}});
+
+document.addEventListener('keydown', (event) => {if(event.key === ".") {addValueToDisplay(".")}});
+
+document.addEventListener('keydown', (event) => {if(event.key === "+") {addValueToDisplay("+")}});
+document.addEventListener('keydown', (event) => {if(event.key === "-") {addValueToDisplay("-")}});
+document.addEventListener('keydown', (event) => {if(event.key === "*") {addValueToDisplay("*")}});
+document.addEventListener('keydown', (event) => {if(event.key === "/") {addValueToDisplay("/")}});
+document.addEventListener('keydown', (event) => {if(event.key === "^") {addValueToDisplay("^")}});
+document.addEventListener('keydown', (event) => {if(event.key === "(") {addValueToDisplay("(")}});
+document.addEventListener('keydown', (event) => {if(event.key === ")") {addValueToDisplay(")")}});
+
+document.addEventListener('keydown', (event) => {
+    console.log(event.key);
+}
+);document.addEventListener('keydown', (event) => {
+    if(event.key === "c") {
+        clearDisplay();
+    }
+});
+document.addEventListener('keydown', (event) => {
+    if (event.key == "Enter") {
+        executeCalculation();
+    }
+});
+document.addEventListener('keydown', (event) => {
+    if(event.key === "=") {
+        executeCalculation();
+    }
+});
+
+
