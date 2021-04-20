@@ -31,8 +31,8 @@ const log = document.getElementById("log");
 let stringToProcess = '';
 
 const numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
-const operators = ["+", "-", "x", "/", "(", ")", "^"];
-const nonMinusOperators = ["+", "x", "/", "(", ")", "^"];
+const operators = ["+", "-", "x", "/", "^"];
+const nonMinusOperators = ["+", "x", "/", "^"];
 const dmOperators = ["/", "x"];
 const asOperators = ["+", "-"];
 
@@ -158,16 +158,67 @@ const retrieveSecondSpliceIndex = function(stringToProcess, index) {
 
 //Calculation Logic
 const bracketsPass = function(stringToProcess) {
-    let index = 0;
-
-    //NEED TO FINISH
-    while (index < stringToProcess.length) {
-        if (stringToProcess[index] === "(") {
-            console.log("(")
-        } else {
-            index++
-        }
+    
+    //Find brackets
+    let bracketsIndexes = [];
+    let bracketsIndexesQueue = [];
+    for (let i = 0; i < stringToProcess.length; i++) {
+        if (stringToProcess[i] === "(") {
+            bracketsIndexesQueue.push(i);
+        } else if (stringToProcess[i] === ")") {
+            if (bracketsIndexesQueue.length === 1) {
+                let openBracketIndex = bracketsIndexesQueue.pop();
+                let closeBracketIndex = i;
+                bracketsIndexes.push([openBracketIndex, closeBracketIndex]);   
+            } else {
+                bracketsIndexesQueue.pop();
+            }         
+        };
     }
+    
+    if (!bracketsIndexes.length) {
+        console.log("No brackets found on this pass.");
+        return stringToProcess
+    };
+
+    console.log("BracketsIndexes: ")
+    bracketsIndexes.forEach(element => {
+        console.log(element);
+    })
+    //Calculate Bodmas on brackets
+
+    for (let i = 0; i < bracketsIndexes.length; i++) {
+        
+        let firstIndex = bracketsIndexes[i][0];  //All brackets index uses must remove brackets and return without
+        let secondIndex = bracketsIndexes[i][1];
+        console.log(`Calculating for bracketsIndexes: ${bracketsIndexes[i]}`);
+        console.log(`stringToProcess before brackets calculation: ${stringToProcess}`);
+        console.log(`firstIndex: ${firstIndex}, secondIndex: ${secondIndex}`);
+        let originalBracketLength =  stringToProcess.slice(firstIndex + 1, secondIndex).length;
+        let firstStringPart = stringToProcess.slice(0, firstIndex);
+        let middleStringPart = calculateBODMAS(stringToProcess.slice(firstIndex + 1, secondIndex));
+        let endStringPart = stringToProcess.slice(secondIndex+1);
+        stringToProcess = firstStringPart + middleStringPart + endStringPart;
+        if (bracketsIndexes[i+1]) {
+            console.log(`There are more brackets after this one. Modifying indexes to match the new modified string...`);
+            let lengthModifier = originalBracketLength + 2 - middleStringPart.length; //This the amount of characters to cut: calculation + two brackets - length of new part
+            console.log(`lengthModifier: ${lengthModifier}`);
+            for (let j=i+1; j < bracketsIndexes.length; j++) {
+                console.log(`openBracketIndex - lengthModifier`);
+                console.log(`${bracketsIndexes[j][0]} - ${lengthModifier}`);
+                bracketsIndexes[j][0] -= lengthModifier;
+                console.log(`new openBracketIndex: ${bracketsIndexes[j][0]}`);
+                console.log(`closeBracketIndex - lengthModifier`);
+                console.log(`${bracketsIndexes[j][1]} - ${lengthModifier}`);
+                bracketsIndexes[j][1] -= lengthModifier;
+                console.log(`new openBracketIndex: ${bracketsIndexes[j][1]}`);
+            };
+        };
+        console.log(`stringToProcess after brackets calculation: ${stringToProcess}`);
+
+    };
+
+    return stringToProcess
 };
 const exponentialPass = function(stringToProcess) {
     let index = 0;
@@ -234,7 +285,7 @@ const exponentialPass = function(stringToProcess) {
         }
     };
 
-    console.log(`Finished division and multiplication pass. stringToProcess: ${stringToProcess}`);
+    console.log(`Finished exponential pass. stringToProcess: ${stringToProcess}`);
 
     return stringToProcess
 };
@@ -375,12 +426,17 @@ const additionAndSubtractionPass = function(stringToProcess) {
 
     return stringToProcess
 };
-const calculateBodmas = function(stringToProcess) {
-    let initialString = stringToProcess;
-
+const calculateBODMAS = function(stringToProcess) {
+    stringToProcess = bracketsPass(stringToProcess);
     stringToProcess = exponentialPass(stringToProcess);
     stringToProcess = divisionAndMultiplicationPass(stringToProcess);
     stringToProcess = additionAndSubtractionPass(stringToProcess);
+    return stringToProcess
+};
+const calculate = function(stringToProcess) {
+    let initialString = stringToProcess;
+
+    stringToProcess = calculateBODMAS(stringToProcess);
 
     let calculatedString = stringToProcess;
     let stringToLog = initialString + "=" + calculatedString;
@@ -467,11 +523,11 @@ const addValueToDisplay = function(value) {
     display.innerText = stringToProcess;
     return
 };
-const calculate = function() {
+const executeCalculation = function() {
     let stringToProcess = display.innerText;
     checkSyntax(stringToProcess);
     if (stringToProcess !== "Syntax Error!") {
-        stringToProcess = calculateBodmas(stringToProcess);
+        stringToProcess = calculate(stringToProcess);
     }
     display.innerHTML = stringToProcess
 };
@@ -498,6 +554,8 @@ minus.addEventListener('click', function() {addValueToDisplay("-")});
 times.addEventListener('click', function() {addValueToDisplay("x")});
 slash.addEventListener('click', function() {addValueToDisplay("/")});
 powerOf.addEventListener('click', function() {addValueToDisplay("^")});
+leftBracket.addEventListener('click', function() {addValueToDisplay("(")});
+rightBracket.addEventListener('click', function() {addValueToDisplay(")")});
 
-equals.addEventListener('click', calculate);
+equals.addEventListener('click', executeCalculation);
 clear.addEventListener('click', clearDisplay);
