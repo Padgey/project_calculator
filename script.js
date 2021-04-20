@@ -35,6 +35,7 @@ const operators = ["+", "-", "x", "/", "^"];
 const nonMinusOperators = ["+", "x", "/", "^"];
 const dmOperators = ["/", "x"];
 const asOperators = ["+", "-"];
+const digits = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
 
 //Operator Functions
 const add = function(num1, num2) {
@@ -158,6 +159,8 @@ const retrieveSecondSpliceIndex = function(stringToProcess, index) {
 
 //Calculation Logic
 const bracketsPass = function(stringToProcess) {
+
+    console.log(`Starting brackets pass. stringToProcess: ${stringToProcess}`);
     
     //Find brackets
     let bracketsIndexes = [];
@@ -185,36 +188,36 @@ const bracketsPass = function(stringToProcess) {
     bracketsIndexes.forEach(element => {
         console.log(element);
     })
+    
     //Calculate Bodmas on brackets
-
     for (let i = 0; i < bracketsIndexes.length; i++) {
         
         let firstIndex = bracketsIndexes[i][0];  //All brackets index uses must remove brackets and return without
         let secondIndex = bracketsIndexes[i][1];
-        console.log(`Calculating for bracketsIndexes: ${bracketsIndexes[i]}`);
-        console.log(`stringToProcess before brackets calculation: ${stringToProcess}`);
-        console.log(`firstIndex: ${firstIndex}, secondIndex: ${secondIndex}`);
+        //console.log(`Calculating for bracketsIndexes: ${bracketsIndexes[i]}`);
+        //console.log(`stringToProcess before brackets calculation: ${stringToProcess}`);
+        //console.log(`firstIndex: ${firstIndex}, secondIndex: ${secondIndex}`);
         let originalBracketLength =  stringToProcess.slice(firstIndex + 1, secondIndex).length;
         let firstStringPart = stringToProcess.slice(0, firstIndex);
         let middleStringPart = calculateBODMAS(stringToProcess.slice(firstIndex + 1, secondIndex));
         let endStringPart = stringToProcess.slice(secondIndex+1);
         stringToProcess = firstStringPart + middleStringPart + endStringPart;
         if (bracketsIndexes[i+1]) {
-            console.log(`There are more brackets after this one. Modifying indexes to match the new modified string...`);
+            //console.log(`There are more brackets after this one. Modifying indexes to match the new modified string...`);
             let lengthModifier = originalBracketLength + 2 - middleStringPart.length; //This the amount of characters to cut: calculation + two brackets - length of new part
-            console.log(`lengthModifier: ${lengthModifier}`);
+            //console.log(`lengthModifier: ${lengthModifier}`);
             for (let j=i+1; j < bracketsIndexes.length; j++) {
-                console.log(`openBracketIndex - lengthModifier`);
-                console.log(`${bracketsIndexes[j][0]} - ${lengthModifier}`);
+                //console.log(`openBracketIndex - lengthModifier`);
+                //console.log(`${bracketsIndexes[j][0]} - ${lengthModifier}`);
                 bracketsIndexes[j][0] -= lengthModifier;
-                console.log(`new openBracketIndex: ${bracketsIndexes[j][0]}`);
-                console.log(`closeBracketIndex - lengthModifier`);
-                console.log(`${bracketsIndexes[j][1]} - ${lengthModifier}`);
+                //console.log(`new openBracketIndex: ${bracketsIndexes[j][0]}`);
+                //console.log(`closeBracketIndex - lengthModifier`);
+                //console.log(`${bracketsIndexes[j][1]} - ${lengthModifier}`);
                 bracketsIndexes[j][1] -= lengthModifier;
-                console.log(`new openBracketIndex: ${bracketsIndexes[j][1]}`);
+                //console.log(`new openBracketIndex: ${bracketsIndexes[j][1]}`);
             };
         };
-        console.log(`stringToProcess after brackets calculation: ${stringToProcess}`);
+        console.log(`Finished brackets pass. stringToProcess: ${stringToProcess}`);
 
     };
 
@@ -452,12 +455,16 @@ const processStartingSumOperators = function(stringToProcess) {
     if (stringToProcess[0] === "+" || stringToProcess[0] === "-") {             //Append 0 to start of string for processing strings starting with + or -
         stringToProcess = "0" + stringToProcess;                                //Is this necessary? Already do this elsewhere - may remove later
     };
+
+    return stringToProcess
 };
 const processInappropriateStartOrEndOperators = function(stringToProcess) {
     if (dmOperators.includes(stringToProcess[0]) || operators.includes(stringToProcess[(stringToProcess.length - 1)])) { //Check if starts or ends with 
         console.log("Syntax Error - stringToProcess begins or ends with an inappropriate operator");                     //inappropriate operators
         stringToProcess = "Syntax Error!";
     };
+
+    return stringToProcess
 };
 const processInappropriateConsecutiveOperators = function(stringToProcess) {
     for (let i = 0; i < stringToProcess.length; i++) {
@@ -466,6 +473,8 @@ const processInappropriateConsecutiveOperators = function(stringToProcess) {
             stringToProcess = "Syntax Error!";
         }
     };
+
+    return stringToProcess
 };
 const processConsecutiveSumOperators = function(stringToProcess) {
     //console.log("Processing string for consecutive sum operators...")
@@ -484,8 +493,10 @@ const processConsecutiveSumOperators = function(stringToProcess) {
         } else {
             i++
         }
-    }
+    };
+
     //console.log(`stringToProcess post processing for consecutive sum operators: ${stringToProcess}`)
+    return stringToProcess
 };
 const processMultipleDecimalsInValue = function(stringToProcess) {
     let numDecimalInOneValue = 0;
@@ -501,16 +512,34 @@ const processMultipleDecimalsInValue = function(stringToProcess) {
             console.log("Syntax Error - stringToProcess has more than one decimal in a value")
             break
         }
-
     }
+    return stringToProcess
+};
+const processDigitsBeforeOpenBracket = function(stringToProcess) {
+    let index = 0;
+    while (index < stringToProcess.length) {
+        if (stringToProcess[index] === "(") {
+            if (digits.includes(stringToProcess[index-1])) {
+                console.log("Found digit before bracket. Amending syntax for processing...");
+                console.log(`stringToProcess pre-bracket amending: ${stringToProcess}`);
+                stringToProcess = stringToProcess.slice(0, index) + "x" + stringToProcess.slice(index);
+                console.log(`stringToProcess post-bracket amending: ${stringToProcess}`);
+                index++
+            };
+        };
+        index++
+    }
+    return stringToProcess
 };
 const checkSyntax = function(stringToProcess) {
     console.log("________________________________________")
     console.log(`Processing ${stringToProcess}...`);
-    processInappropriateStartOrEndOperators(stringToProcess);
-    processInappropriateConsecutiveOperators(stringToProcess);
-    processConsecutiveSumOperators(stringToProcess);   //Process string to be able to handle multiple consecutive plus or minus operators
-    processMultipleDecimalsInValue(stringToProcess);                  
+    stringToProcess = processInappropriateStartOrEndOperators(stringToProcess);
+    stringToProcess = processInappropriateConsecutiveOperators(stringToProcess);
+    stringToProcess = processConsecutiveSumOperators(stringToProcess);   //Process string to be able to handle multiple consecutive plus or minus operators
+    stringToProcess = processMultipleDecimalsInValue(stringToProcess);
+    stringToProcess = processDigitsBeforeOpenBracket(stringToProcess);
+    return stringToProcess                  
 };
 
 //Calculator Interface Logic
@@ -525,7 +554,7 @@ const addValueToDisplay = function(value) {
 };
 const executeCalculation = function() {
     let stringToProcess = display.innerText;
-    checkSyntax(stringToProcess);
+    stringToProcess = checkSyntax(stringToProcess);
     if (stringToProcess !== "Syntax Error!") {
         stringToProcess = calculate(stringToProcess);
     }
