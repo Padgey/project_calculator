@@ -11,7 +11,6 @@ const seven = document.getElementById("7");
 const eight = document.getElementById("8");
 const nine = document.getElementById("9");
 const zero = document.getElementById("0");
-
 const decimal = document.getElementById(".");
 
 const plus = document.getElementById("+");
@@ -22,14 +21,11 @@ const leftBracket = document.getElementById("(");
 const rightBracket = document.getElementById(")");
 const powerOf = document.getElementById("^");
 const equals = document.getElementById("=");
-
 const clear = document.getElementById("clear");
 
 const log = document.getElementById("log");
 
 //Global Variables
-let stringToProcess = '';
-
 const numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
 const operators = ["+", "-", "x", "/", "^"];
 const nonMinusOperators = ["+", "x", "/", "^"];
@@ -87,12 +83,11 @@ const exponential = function(num1, num2) {
     return sum
 };
 
-
 //Helper Functions
-const reverseString = function(str) {
+const reverseString = function(string) {
     let newString = "";
-    for (let i = str.length - 1; i >= 0; i--) {
-        newString += str[i];
+    for (let i = string.length - 1; i >= 0; i--) {
+        newString += string[i];
     }
     return newString
 };
@@ -133,7 +128,7 @@ const nextValueIsNegative = function(stringToProcess, index) {
     let valueIsNegative = false;
     if (stringToProcess[index + 1] === "-") {
         valueIsNegative = true;
-    }
+    };
     return valueIsNegative
 };
 const retrieveFirstSpliceIndex = function(stringToProcess, index) {
@@ -159,10 +154,8 @@ const retrieveSecondSpliceIndex = function(stringToProcess, index) {
 
 //Calculation Logic
 const bracketsPass = function(stringToProcess) {
-
-    console.log(`Starting brackets pass. stringToProcess: ${stringToProcess}`);
-    
     //Find brackets
+    //This finds all the outer brackets in the string
     let bracketsIndexes = [];
     let bracketsIndexesQueue = [];
     for (let i = 0; i < stringToProcess.length; i++) {
@@ -177,64 +170,46 @@ const bracketsPass = function(stringToProcess) {
                 bracketsIndexesQueue.pop();
             }         
         };
-    }
+    };
     
+    //This moves on to the exponential pass if no brackets found
     if (!bracketsIndexes.length) {
         console.log("No brackets found on this pass.");
         return stringToProcess
     };
-
-    console.log("BracketsIndexes: ")
-    bracketsIndexes.forEach(element => {
-        console.log(element);
-    })
     
-    //Calculate Bodmas on brackets
+    //Calculate BODMAS on each outer bracket found
     for (let i = 0; i < bracketsIndexes.length; i++) {
-        
-        let firstIndex = bracketsIndexes[i][0];  //All brackets index uses must remove brackets and return without
+        //Must remove brackets and return without string without them. 
+        //Any other brackets indexes stored must be modified to keep track of them in the new string length
+        let firstIndex = bracketsIndexes[i][0];  
         let secondIndex = bracketsIndexes[i][1];
-        //console.log(`Calculating for bracketsIndexes: ${bracketsIndexes[i]}`);
-        //console.log(`stringToProcess before brackets calculation: ${stringToProcess}`);
-        //console.log(`firstIndex: ${firstIndex}, secondIndex: ${secondIndex}`);
-        let originalBracketLength =  stringToProcess.slice(firstIndex + 1, secondIndex).length;
+        let originalBracket =  stringToProcess.slice(firstIndex + 1, secondIndex);
         let firstStringPart = stringToProcess.slice(0, firstIndex);
+        //Perform the calculation on the bracket contents. This will recursively call calculateBODMAS to deal with inner brackets
         let middleStringPart = calculateBODMAS(stringToProcess.slice(firstIndex + 1, secondIndex));
         let endStringPart = stringToProcess.slice(secondIndex+1);
         stringToProcess = firstStringPart + middleStringPart + endStringPart;
         if (bracketsIndexes[i+1]) {
-            //console.log(`There are more brackets after this one. Modifying indexes to match the new modified string...`);
-            let lengthModifier = originalBracketLength + 2 - middleStringPart.length; //This the amount of characters to cut: calculation + two brackets - length of new part
-            //console.log(`lengthModifier: ${lengthModifier}`);
+            //Must change other brackets indexes to new positions
+            //This the amount of characters to cut: calculation + two brackets - length of new part
+            let lengthModifier = originalBracket.length + 2 - middleStringPart.length; 
             for (let j=i+1; j < bracketsIndexes.length; j++) {
-                //console.log(`openBracketIndex - lengthModifier`);
-                //console.log(`${bracketsIndexes[j][0]} - ${lengthModifier}`);
                 bracketsIndexes[j][0] -= lengthModifier;
-                //console.log(`new openBracketIndex: ${bracketsIndexes[j][0]}`);
-                //console.log(`closeBracketIndex - lengthModifier`);
-                //console.log(`${bracketsIndexes[j][1]} - ${lengthModifier}`);
                 bracketsIndexes[j][1] -= lengthModifier;
-                //console.log(`new openBracketIndex: ${bracketsIndexes[j][1]}`);
             };
         };
         console.log(`Finished brackets pass. stringToProcess: ${stringToProcess}`);
-
     };
-
     return stringToProcess
 };
 const exponentialPass = function(stringToProcess) {
     let index = 0;
-
     while (index < stringToProcess.length) {
-        //console.log(`Processing index: ${index}`);
         if (stringToProcess[index] === "^") {
-             //Check if either of the values is negative
-             let valueOneIsNegative = previousValueIsNegative(stringToProcess, index);
-             let valueTwoIsNegative = nextValueIsNegative(stringToProcess, index);
-             //console.log(`valueOneIsNegative: ${valueOneIsNegative}`);
-             //console.log(`valueTwoIsNegative: ${valueTwoIsNegative}`);
- 
+            //Check if either of the values is negative, this is necessary to preserve operators correctly
+            let valueOneIsNegative = previousValueIsNegative(stringToProcess, index);
+            let valueTwoIsNegative = nextValueIsNegative(stringToProcess, index);
             let valueOne = retrievePreviousValue(stringToProcess, index);
             let valueTwo;
             if (valueTwoIsNegative) {
@@ -244,6 +219,7 @@ const exponentialPass = function(stringToProcess) {
             };
 
             let firstSpliceIndex = retrieveFirstSpliceIndex(stringToProcess, index);
+            firstSpliceIndex++;             //This is to preserve the operator if it is a x or /
             let secondSpliceIndex;
             if (valueTwoIsNegative) {
                 secondSpliceIndex = retrieveSecondSpliceIndex(stringToProcess, index + 1);
@@ -257,12 +233,6 @@ const exponentialPass = function(stringToProcess) {
             if (valueTwoIsNegative) {
                 operatedValue = 1 / operatedValue;
             };
-
-            //console.log(`valueOne: ${valueOne}`);
-            //console.log(`valueTwo: ${valueTwo}`);
-            //console.log(`firstSpliceIndex: ${firstSpliceIndex}`);
-            //console.log(`secondSpliceIndex: ${secondSpliceIndex}`);
-            //console.log(`operatedValue: ${operatedValue}`);
  
             let operatedValueString = operatedValue.toString();  //Get the value to replace the calculation in the stringToProcess
             let firstStringPart = stringToProcess.slice(0, firstSpliceIndex);
@@ -271,39 +241,27 @@ const exponentialPass = function(stringToProcess) {
             if (secondSpliceIndex) {        
                 secondStringPart = stringToProcess.slice(secondSpliceIndex);
             };
-
+            
             if (valueOneIsNegative === false) {
-                stringToProcess = firstStringPart + "+" + operatedValueString + secondStringPart;
+                stringToProcess = firstStringPart + operatedValueString + secondStringPart;
             } else {
-                stringToProcess = firstStringPart + "-" + operatedValueString + secondStringPart;
-            }
-            //console.log(stringToProcess);
-
+                stringToProcess = firstStringPart + operatedValueString + secondStringPart;
+            };
             index = (firstSpliceIndex -1) + operatedValueString.length + 1;
-
         } else {
-
             index++
-
         }
     };
-
     console.log(`Finished exponential pass. stringToProcess: ${stringToProcess}`);
-
     return stringToProcess
 };
 const divisionAndMultiplicationPass = function(stringToProcess) {
     let index = 0;
-
     while (index < stringToProcess.length) {
-        //console.log(`Processing index: ${index}`);
         if (stringToProcess[index] === "/" || stringToProcess[index] === "x") {
-             //Check if either of the values is negative
-             let valueOneIsNegative = previousValueIsNegative(stringToProcess, index);
-             let valueTwoIsNegative = nextValueIsNegative(stringToProcess, index);
-             //console.log(`valueOneIsNegative: ${valueOneIsNegative}`);
-             //console.log(`valueTwoIsNegative: ${valueTwoIsNegative}`);
- 
+            //Check if either of the values is negative, this is necessary to correctly preserve operators
+            let valueOneIsNegative = previousValueIsNegative(stringToProcess, index);
+            let valueTwoIsNegative = nextValueIsNegative(stringToProcess, index);
             let valueOne = retrievePreviousValue(stringToProcess, index);
             let valueTwo;
             if (valueTwoIsNegative) {
@@ -326,12 +284,6 @@ const divisionAndMultiplicationPass = function(stringToProcess) {
             } else {
                 operatedValue = multiply(valueOne, valueTwo);
             };
-
-            //console.log(`valueOne: ${valueOne}`);
-            //console.log(`valueTwo: ${valueTwo}`);
-            //console.log(`firstSpliceIndex: ${firstSpliceIndex}`);
-            //console.log(`secondSpliceIndex: ${secondSpliceIndex}`);
-            //console.log(`operatedValue: ${operatedValue}`);
  
             let operatedValueString = operatedValue.toString();  //Get the value to replace the calculation in the stringToProcess
             let firstStringPart = stringToProcess.slice(0, firstSpliceIndex);
@@ -346,54 +298,34 @@ const divisionAndMultiplicationPass = function(stringToProcess) {
             } else {
                 stringToProcess = firstStringPart + "-" + operatedValueString + secondStringPart;
             };
-            //console.log(stringToProcess);
-
             index = (firstSpliceIndex -1) + operatedValueString.length + 1;
-
         } else {
-
             index++
-
         }
     };
-
     console.log(`Finished division and multiplication pass. stringToProcess: ${stringToProcess}`);
-
     return stringToProcess
 };
 const additionAndSubtractionPass = function(stringToProcess) {
-    //console.log(`stringToProcess preProcessingStartingSumOperators: ${stringToProcess}`);
-    //processStartingSumOperators(stringToProcess);
-    //console.log(`stringToProcess: ${stringToProcess}`);
-
     let sum = 0;
     let positiveStrings = [];
     let negativeStrings = [];
-    //console.log(`sum: ${sum}\n positiveStrings: ${positiveStrings}\n negativeStrings: ${negativeStrings}`);
-
-    if (operators.includes(stringToProcess[0])) {                       //Fix stringToProcess so that first value is correctly interpreted
+    //This fixes stringToProcess so that first value is correctly interpreted on this pass
+    if (operators.includes(stringToProcess[0])) {                       
         stringToProcess = "0" + stringToProcess
     } else {
         stringToProcess = "0+" + stringToProcess
     };
 
-    //console.log(`stringToProcess: ${stringToProcess}`);
-
-    for (let index = 0; index < stringToProcess.length; index++) {    
-        //console.log(`Processing index: ${index} - ${stringToProcess[index]}`);  
-        
+    for (let index = 0; index < stringToProcess.length; index++) {
         //Extract positive and negative strings
         if (stringToProcess[index] === "+") {
-            //console.log("Pushing positive value...");
             positiveStrings.push(retrieveNextValue(stringToProcess, index))
         };
         if (stringToProcess[index] === "-") {
-            //console.log("Pushing negative value...");
             negativeStrings.push(retrieveNextValue(stringToProcess, index))
         };
     };
-
-    //console.log(`sum: ${sum}\n positiveStrings: ${positiveStrings}\n negativeStrings: ${negativeStrings}`);
 
     let positiveValues = [];                            //Convert strings to values
     let negativeValues = [];
@@ -426,7 +358,6 @@ const additionAndSubtractionPass = function(stringToProcess) {
     let finalString = sum.toString();
     stringToProcess = finalString;
     console.log(`Finished addition and subtraction pass. stringToProcess: ${stringToProcess}`);
-
     return stringToProcess
 };
 const calculateBODMAS = function(stringToProcess) {
@@ -438,10 +369,10 @@ const calculateBODMAS = function(stringToProcess) {
 };
 const calculate = function(stringToProcess) {
     let initialString = stringToProcess;
-
     stringToProcess = calculateBODMAS(stringToProcess);
-
     let calculatedString = stringToProcess;
+
+    //Log calculation in the history log
     let stringToLog = initialString + "=" + calculatedString;
     let elementToDisplay = document.createElement("P");
     elementToDisplay.innerHTML = stringToLog;
@@ -455,7 +386,6 @@ const processStartingSumOperators = function(stringToProcess) {
     if (stringToProcess[0] === "+" || stringToProcess[0] === "-") {             //Append 0 to start of string for processing strings starting with + or -
         stringToProcess = "0" + stringToProcess;                                //Is this necessary? Already do this elsewhere - may remove later
     };
-
     return stringToProcess
 };
 const processInappropriateStartOrEndOperators = function(stringToProcess) {
@@ -463,7 +393,6 @@ const processInappropriateStartOrEndOperators = function(stringToProcess) {
         console.log("Syntax Error - stringToProcess begins or ends with an inappropriate operator");                     //inappropriate operators
         stringToProcess = "Syntax Error!";
     };
-
     return stringToProcess
 };
 const processInappropriateConsecutiveOperators = function(stringToProcess) {
@@ -473,11 +402,9 @@ const processInappropriateConsecutiveOperators = function(stringToProcess) {
             stringToProcess = "Syntax Error!";
         }
     };
-
     return stringToProcess
 };
 const processConsecutiveSumOperators = function(stringToProcess) {
-    //console.log("Processing string for consecutive sum operators...")
     let i = 0;
     while (i < stringToProcess.length - 1) {
         let thisCharacter = stringToProcess[i];
@@ -494,8 +421,6 @@ const processConsecutiveSumOperators = function(stringToProcess) {
             i++
         }
     };
-
-    //console.log(`stringToProcess post processing for consecutive sum operators: ${stringToProcess}`)
     return stringToProcess
 };
 const processMultipleDecimalsInValue = function(stringToProcess) {
@@ -512,7 +437,7 @@ const processMultipleDecimalsInValue = function(stringToProcess) {
             console.log("Syntax Error - stringToProcess has more than one decimal in a value")
             break
         }
-    }
+    };
     return stringToProcess
 };
 const processDigitsBeforeOpenBracket = function(stringToProcess) {
@@ -528,7 +453,7 @@ const processDigitsBeforeOpenBracket = function(stringToProcess) {
             };
         };
         index++
-    }
+    };
     return stringToProcess
 };
 const checkSyntax = function(stringToProcess) {
@@ -546,7 +471,7 @@ const checkSyntax = function(stringToProcess) {
 const addValueToDisplay = function(value) {
     if (display.innerText === "Calculation rendered here...") {
         display.innerText = '';
-    }
+    };
     let stringToProcess = display.innerText;
     stringToProcess += value;
     display.innerText = stringToProcess;
@@ -565,6 +490,7 @@ const clearDisplay = function() {
 };
 
 //Event Listeners
+//Mouse interface
 zero.addEventListener('click', function() {addValueToDisplay("0")});
 one.addEventListener('click', function() {addValueToDisplay("1")});
 two.addEventListener('click', function() {addValueToDisplay("2")});
@@ -589,6 +515,7 @@ rightBracket.addEventListener('click', function() {addValueToDisplay(")")});
 equals.addEventListener('click', executeCalculation);
 clear.addEventListener('click', clearDisplay);
 
+//Keyboard interface
 document.addEventListener('keydown', (event) => {if(event.key === "0") {addValueToDisplay("0")}});
 document.addEventListener('keydown', (event) => {if(event.key === "1") {addValueToDisplay("1")}});
 document.addEventListener('keydown', (event) => {if(event.key === "2") {addValueToDisplay("2")}});
@@ -599,7 +526,6 @@ document.addEventListener('keydown', (event) => {if(event.key === "6") {addValue
 document.addEventListener('keydown', (event) => {if(event.key === "7") {addValueToDisplay("7")}});
 document.addEventListener('keydown', (event) => {if(event.key === "8") {addValueToDisplay("8")}});
 document.addEventListener('keydown', (event) => {if(event.key === "9") {addValueToDisplay("9")}});
-
 document.addEventListener('keydown', (event) => {if(event.key === ".") {addValueToDisplay(".")}});
 
 document.addEventListener('keydown', (event) => {if(event.key === "+") {addValueToDisplay("+")}});
@@ -612,7 +538,7 @@ document.addEventListener('keydown', (event) => {if(event.key === ")") {addValue
 
 document.addEventListener('keydown', (event) => {
     console.log(event.key);
-}
+};
 );document.addEventListener('keydown', (event) => {
     if(event.key === "c") {
         clearDisplay();
