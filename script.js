@@ -538,8 +538,8 @@ document.addEventListener('keydown', (event) => {if(event.key === ")") {addValue
 
 document.addEventListener('keydown', (event) => {
     console.log(event.key);
-};
-);document.addEventListener('keydown', (event) => {
+});
+document.addEventListener('keydown', (event) => {
     if(event.key === "c") {
         clearDisplay();
     }
