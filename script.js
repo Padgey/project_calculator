@@ -530,7 +530,7 @@ document.addEventListener('keydown', (event) => {if(event.key === ".") {addValue
 
 document.addEventListener('keydown', (event) => {if(event.key === "+") {addValueToDisplay("+")}});
 document.addEventListener('keydown', (event) => {if(event.key === "-") {addValueToDisplay("-")}});
-document.addEventListener('keydown', (event) => {if(event.key === "*") {addValueToDisplay("*")}});
+document.addEventListener('keydown', (event) => {if(event.key === "*") {addValueToDisplay("x")}});
 document.addEventListener('keydown', (event) => {if(event.key === "/") {addValueToDisplay("/")}});
 document.addEventListener('keydown', (event) => {if(event.key === "^") {addValueToDisplay("^")}});
 document.addEventListener('keydown', (event) => {if(event.key === "(") {addValueToDisplay("(")}});
